@@ -6,6 +6,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var model: AppModel?
     private var monitor: ClipboardMonitor?
     private var statusItemController: StatusItemController?
+    private var panelController: PanelController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Preferences.registerDefaults()
@@ -20,7 +21,13 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         }
         self.model = model
 
-        statusItemController = StatusItemController(model: model)
+        let panelController = PanelController(model: model)
+        self.panelController = panelController
+        statusItemController = StatusItemController(openPanel: { panelController.show() })
+
+        if !HotkeyManager.shared.register(.default, action: { panelController.toggle() }) {
+            log.error("Không đăng ký được phím tắt ⌥V")
+        }
 
         let monitor = ClipboardMonitor { capture in
             Task { await model.ingest(capture) }
