@@ -15,7 +15,16 @@ Docs (in Vietnamese): [design](docs/DESIGN.md) · [plan](docs/PLAN.md) · [statu
 ## Requirements
 
 - macOS 14 or later on Apple Silicon (every Apple Silicon Mac, including M1, can update to macOS 14)
-- Swift 6 — the Command Line Tools are enough, no Xcode needed: `xcode-select --install`
+- To build from source: Swift 6 — the Command Line Tools are enough, no Xcode needed: `xcode-select --install`
+
+## Install a release
+
+1. Download `9clipboard-<version>.zip` from [Releases](https://github.com/lamht09/9clipboard/releases), unzip it and move `9clipboard.app` to `/Applications`.
+2. Open it. The app is signed with a self-signed certificate, not notarized by Apple, so macOS blocks it the first time **every new version** is opened: go to System Settings › Privacy & Security › **Open Anyway**. Or skip that prompt by clearing the download flag before opening:
+   ```sh
+   xattr -dr com.apple.quarantine /Applications/9clipboard.app
+   ```
+3. Grant Accessibility access when asked (needed to paste with ⌘V). Every release is signed with the same certificate, so updating by replacing the app keeps this permission.
 
 ## Build and install
 

@@ -15,7 +15,16 @@ Thiết kế: [docs/DESIGN.md](docs/DESIGN.md) · Kế hoạch: [docs/PLAN.md](d
 ## Yêu cầu
 
 - macOS 14 trở lên, Apple Silicon (mọi máy Apple Silicon, kể cả M1, đều cập nhật được lên macOS 14)
-- Swift 6 (Command Line Tools là đủ, không cần Xcode): `xcode-select --install`
+- Để build từ mã nguồn: Swift 6 (Command Line Tools là đủ, không cần Xcode): `xcode-select --install`
+
+## Cài bản phát hành
+
+1. Tải `9clipboard-<phiên bản>.zip` ở trang [Releases](https://github.com/lamht09/9clipboard/releases), giải nén và chuyển `9clipboard.app` vào `/Applications`.
+2. Mở app. App ký bằng chứng chỉ tự ký, không được Apple công chứng (notarize), nên macOS chặn lần mở đầu của **mỗi bản mới**: vào System Settings › Quyền riêng tư & Bảo mật › **Vẫn mở** (Open Anyway). Hoặc bỏ qua bước này bằng cách xoá cờ tải về trước khi mở:
+   ```sh
+   xattr -dr com.apple.quarantine /Applications/9clipboard.app
+   ```
+3. Cấp quyền Trợ năng khi được hỏi (để dán bằng ⌘V). Mọi bản phát hành ký cùng một chứng chỉ nên cập nhật bằng cách thay app vẫn giữ quyền này.
 
 ## Build và cài
 
