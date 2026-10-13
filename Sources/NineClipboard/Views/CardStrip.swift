@@ -2,6 +2,8 @@ import ClipCore
 import SwiftUI
 
 struct CardStrip: View {
+    /// Lề quanh thẻ, đủ chứa phóng to 1.03, viền chọn và bóng đổ (ScrollView cắt mọi thứ tràn ra ngoài).
+    static let verticalInset: CGFloat = 14
     @Bindable var viewModel: PanelViewModel
 
     var body: some View {
@@ -17,12 +19,15 @@ struct CardStrip: View {
                     }
                 }
                 .padding(.horizontal, 14)
-                .padding(.vertical, 6)
+                .padding(.vertical, Self.verticalInset)
             }
             .overlay {
                 if viewModel.items.isEmpty {
                     Text("Chưa có gì trong lịch sử. Hãy copy thứ gì đó.")
                         .foregroundStyle(.secondary)
+                        .padding(.horizontal, 16)
+                        .padding(.vertical, 10)
+                        .background(VisualEffectBackground(cornerRadius: 10))
                 }
             }
             .onChange(of: viewModel.scrollTarget) { _, id in

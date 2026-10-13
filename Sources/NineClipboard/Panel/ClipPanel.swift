@@ -19,7 +19,7 @@ final class ClipPanel: NSPanel {
         isMovable = false
         backgroundColor = .clear
         isOpaque = false
-        hasShadow = true
+        hasShadow = false
         animationBehavior = .none
     }
 
@@ -28,6 +28,26 @@ final class ClipPanel: NSPanel {
 
     override func sendEvent(_ event: NSEvent) {
         if event.type == .keyDown, keyHandler?(event) == true { return }
+        if event.type == .scrollWheel, let horizontal = Self.verticalToHorizontal(event) {
+            super.sendEvent(horizontal)
+            return
+        }
         super.sendEvent(event)
+    }
+
+    /// Dải thẻ cuộn ngang, nên đổi cuộn dọc (con lăn chuột) thành cuộn ngang.
+    private static func verticalToHorizontal(_ event: NSEvent) -> NSEvent? {
+        guard abs(event.scrollingDeltaY) > abs(event.scrollingDeltaX),
+              let cg = event.cgEvent?.copy() else { return nil }
+        let pairs: [(CGEventField, CGEventField)] = [
+            (.scrollWheelEventDeltaAxis1, .scrollWheelEventDeltaAxis2),
+            (.scrollWheelEventFixedPtDeltaAxis1, .scrollWheelEventFixedPtDeltaAxis2),
+            (.scrollWheelEventPointDeltaAxis1, .scrollWheelEventPointDeltaAxis2),
+        ]
+        for (vertical, horizontal) in pairs {
+            cg.setDoubleValueField(horizontal, value: cg.getDoubleValueField(vertical))
+            cg.setDoubleValueField(vertical, value: 0)
+        }
+        return NSEvent(cgEvent: cg)
     }
 }

@@ -5,7 +5,8 @@ import SwiftUI
 
 @MainActor
 final class PanelController: NSObject, NSWindowDelegate {
-    static let height: CGFloat = 190
+    /// Cao vừa đủ cho thẻ + lề chứa hiệu ứng phóng to và bóng đổ.
+    static let height: CGFloat = CardView.size + CardStrip.verticalInset * 2
     static let maxWidth: CGFloat = 1100
     static let margin: CGFloat = 12
 
@@ -19,24 +20,12 @@ final class PanelController: NSObject, NSWindowDelegate {
         viewModel = PanelViewModel(model: model)
         super.init()
 
-        let effect = NSVisualEffectView()
-        effect.material = .hudWindow
-        effect.blendingMode = .behindWindow
-        effect.state = .active
-        effect.wantsLayer = true
-        effect.layer?.cornerRadius = 16
-        effect.layer?.masksToBounds = true
-
+        // Panel trong suốt: không nền, không khung — chỉ các thẻ tự vẽ nền của mình.
         let hosting = NSHostingView(rootView: PanelRootView(viewModel: viewModel))
-        hosting.translatesAutoresizingMaskIntoConstraints = false
-        effect.addSubview(hosting)
-        NSLayoutConstraint.activate([
-            hosting.leadingAnchor.constraint(equalTo: effect.leadingAnchor),
-            hosting.trailingAnchor.constraint(equalTo: effect.trailingAnchor),
-            hosting.topAnchor.constraint(equalTo: effect.topAnchor),
-            hosting.bottomAnchor.constraint(equalTo: effect.bottomAnchor),
-        ])
-        panel.contentView = effect
+        hosting.sizingOptions = []
+        hosting.wantsLayer = true
+        hosting.layer?.backgroundColor = .clear
+        panel.contentView = hosting
         panel.delegate = self
         panel.keyHandler = { [weak self] event in self?.handleKey(event) ?? false }
         viewModel.onPick = { [weak self] item, plainOnly in self?.paste(item, plainOnly: plainOnly) }

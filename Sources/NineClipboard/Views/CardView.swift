@@ -19,8 +19,10 @@ struct CardView: View {
             footer
         }
         .frame(width: Self.size, height: Self.size)
-        .background(Color(nsColor: .textBackgroundColor).opacity(isSelected ? 0.95 : 0.7))
+        .background(VisualEffectBackground(cornerRadius: 10))
+        .background(Color(nsColor: .textBackgroundColor).opacity(isSelected ? 0.6 : 0.35))
         .clipShape(RoundedRectangle(cornerRadius: 10))
+        .shadow(color: .black.opacity(0.25), radius: 5, y: 2)
         .overlay {
             RoundedRectangle(cornerRadius: 10)
                 .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.06), lineWidth: isSelected ? 2 : 1)
@@ -77,6 +79,24 @@ struct CardView: View {
         .padding(.horizontal, 8)
         .padding(.bottom, 6)
     }
+}
+
+/// Nền kính mờ (blend với nội dung phía sau cửa sổ), vì panel trong suốt.
+struct VisualEffectBackground: NSViewRepresentable {
+    var cornerRadius: CGFloat
+
+    func makeNSView(context: Context) -> NSVisualEffectView {
+        let view = NSVisualEffectView()
+        view.material = .popover
+        view.blendingMode = .behindWindow
+        view.state = .active
+        view.wantsLayer = true
+        view.layer?.cornerRadius = cornerRadius
+        view.layer?.masksToBounds = true
+        return view
+    }
+
+    func updateNSView(_ view: NSVisualEffectView, context: Context) {}
 }
 
 extension ClipKind {
