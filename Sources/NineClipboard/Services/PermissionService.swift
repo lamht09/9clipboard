@@ -23,7 +23,7 @@ enum PermissionService {
         presentPermissionAlert(
             title: "Chào mừng đến với 9clipboard",
             message: """
-            Bấm ⌥V để mở lịch sử clipboard.
+            Bấm \(Preferences.hotkey.displayString) để mở lịch sử clipboard.
 
             Để tự dán vào app đang dùng, 9clipboard cần quyền Trợ năng (Accessibility) để gửi phím ⌘V. \
             Nếu không cấp, bạn vẫn dùng được: chọn một mục rồi tự bấm ⌘V.

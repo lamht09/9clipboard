@@ -8,13 +8,15 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var privacy: PrivacyController?
     private var statusItemController: StatusItemController?
     private var panelController: PanelController?
+    private var settingsController: SettingsWindowController?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Preferences.registerDefaults()
 
         let model: AppModel
+        let dir: URL
         do {
-            let dir = try DataDirectory.url()
+            dir = try DataDirectory.url()
             let database = try AppDatabase.onDisk(at: dir.appendingPathComponent("clips.sqlite"))
             let blobs = try BlobStore(root: dir)
             model = AppModel(store: ClipboardStore(database: database, blobs: blobs))
@@ -27,12 +29,25 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.panelController = panelController
         let privacy = PrivacyController()
         self.privacy = privacy
-        let statusItemController = StatusItemController(privacy: privacy, openPanel: { panelController.show() })
+        let settingsController = SettingsWindowController(model: SettingsModel(app: model, dataDirectory: dir))
+        self.settingsController = settingsController
+        let statusItemController = StatusItemController(
+            privacy: privacy,
+            openPanel: { panelController.show() },
+            openSettings: { settingsController.show() },
+            clearHistory: {
+                guard SettingsModel.confirm(
+                    "Xoá toàn bộ lịch sử?", info: "Các mục đã ghim vẫn được giữ lại. Không hoàn tác được.",
+                    button: "Xoá") else { return }
+                Task { await model.clearHistory() }
+            })
         self.statusItemController = statusItemController
         privacy.onChange = { statusItemController.updateIcon() }
 
-        if !HotkeyManager.shared.register(.default, action: { panelController.toggle() }) {
-            log.error("Không đăng ký được phím tắt ⌥V")
+        HotkeyManager.shared.action = { panelController.toggle() }
+        let shortcut = Preferences.hotkey
+        if !HotkeyManager.shared.register(shortcut) {
+            log.error("Không đăng ký được phím tắt \(shortcut.displayString)")
         }
 
         let monitor = ClipboardMonitor(privacy: privacy) { capture, sensitive in

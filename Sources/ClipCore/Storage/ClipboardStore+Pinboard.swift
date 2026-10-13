@@ -32,6 +32,17 @@ extension ClipboardStore {
         try database.queue.write { db in try board.update(db) }
     }
 
+    /// Đặt lại thứ tự bảng theo `ids` (0…n-1). Bảng không có trong `ids` xếp sau, giữ thứ tự cũ.
+    public func reorderPinboards(_ ids: [Int64]) throws {
+        try database.queue.write { db in
+            let all = try Int64.fetchAll(db, sql: "SELECT id FROM pinboard ORDER BY sort_order, id")
+            let ordered = ids.filter(all.contains) + all.filter { !ids.contains($0) }
+            for (order, id) in ordered.enumerated() {
+                try db.execute(sql: "UPDATE pinboard SET sort_order = ? WHERE id = ?", arguments: [order, id])
+            }
+        }
+    }
+
     /// Xoá bảng; các mục trong bảng được bỏ ghim (vẫn còn trong lịch sử), đưa lên đầu để không bị retention xoá ngay.
     public func deletePinboard(id: Int64, now: Date = Date()) throws {
         try database.queue.write { db in

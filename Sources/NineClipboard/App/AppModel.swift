@@ -137,6 +137,28 @@ final class AppModel {
         await perform("deletePinboard") { try await $0.deletePinboard(id: id) }
     }
 
+    func reorderPinboards(_ boards: [Pinboard]) async {
+        let ids = boards.compactMap(\.id)
+        await perform("reorderPinboards") { try await $0.reorderPinboards(ids) }
+    }
+
+    // MARK: - Xoá lịch sử (M8) — mục đã ghim luôn được giữ
+
+    /// `bundleID` = nil: xoá mọi mục chưa ghim.
+    func clearHistory(fromApp bundleID: String? = nil) async {
+        await perform("clearHistory") { store in
+            if let bundleID {
+                try await store.clearHistory(fromApp: bundleID)
+            } else {
+                try await store.clearHistory()
+            }
+        }
+    }
+
+    func sourceApps() async -> [ClipboardStore.SourceApp] {
+        (try? await store.sourceApps()) ?? []
+    }
+
     /// Chạy thao tác trên store, ghi log nếu lỗi, rồi nạp lại.
     private func perform(_ name: String, _ operation: (ClipboardStore) async throws -> Void) async {
         do {

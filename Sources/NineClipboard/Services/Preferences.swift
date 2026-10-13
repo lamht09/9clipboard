@@ -18,12 +18,21 @@ enum Preferences {
     enum Key {
         static let historyLimit = "historyLimit"
         static let autoPaste = "autoPaste"
-        static let launchAtLogin = "launchAtLogin"
         static let excludedBundleIDs = "excludedBundleIDs"
         static let detectPasswords = "detectPasswords"
         static let passwordLifetimeMinutes = "passwordLifetimeMinutes"
         static let pausedUntil = "pausedUntil"
         static let maxImageMB = "maxImageMB"
+        static let hotkey = "hotkey"
+    }
+
+    /// Phím tắt mở panel (mặc định ⌥V).
+    static var hotkey: HotkeyManager.Shortcut {
+        get {
+            defaults.data(forKey: Key.hotkey)
+                .flatMap { try? JSONDecoder().decode(HotkeyManager.Shortcut.self, from: $0) } ?? .default
+        }
+        set { defaults.set(try? JSONEncoder().encode(newValue), forKey: Key.hotkey) }
     }
 
     static var historyLimit: Int {
@@ -47,7 +56,7 @@ enum Preferences {
         set { defaults.set(newValue, forKey: Key.detectPasswords) }
     }
 
-    /// Mật khẩu tự xoá sau bao nhiêu phút nếu người dùng không giữ lại. Sửa được ở Settings (M8).
+    /// Mật khẩu tự xoá sau bao nhiêu phút nếu người dùng không giữ lại. Sửa ở Settings › Riêng tư.
     static var passwordLifetimeMinutes: Int {
         get { max(1, defaults.integer(forKey: Key.passwordLifetimeMinutes)) }
         set { defaults.set(newValue, forKey: Key.passwordLifetimeMinutes) }

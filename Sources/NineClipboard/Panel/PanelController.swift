@@ -10,6 +10,9 @@ final class PanelController: NSObject, NSWindowDelegate {
     static let margin: CGFloat = 12
 
     private let panel = ClipPanel()
+    private let previewPanel = PreviewPanel()
+    private let previewLoader: LargePreviewLoader
+    static let previewSize = NSSize(width: 680, height: 420)
     let viewModel: PanelViewModel
     private let model: AppModel
     private(set) var isShown = false
@@ -17,7 +20,14 @@ final class PanelController: NSObject, NSWindowDelegate {
     init(model: AppModel) {
         self.model = model
         viewModel = PanelViewModel(model: model)
+        previewLoader = LargePreviewLoader(store: model.store)
         super.init()
+
+        let preview = NSHostingView(rootView: LargePreviewView(viewModel: viewModel, loader: previewLoader))
+        preview.sizingOptions = []
+        preview.wantsLayer = true
+        preview.layer?.backgroundColor = .clear
+        previewPanel.contentView = preview
 
         // Panel trong suốt: không nền, không khung — chỉ các thẻ tự vẽ nền của mình.
         let hosting = NSHostingView(rootView: PanelRootView(viewModel: viewModel))
@@ -88,6 +98,7 @@ final class PanelController: NSObject, NSWindowDelegate {
     func hide(animated: Bool = true) {
         guard isShown else { return }
         isShown = false
+        closePreview()
         guard animated else {
             panel.orderOut(nil)
             return
@@ -109,6 +120,29 @@ final class PanelController: NSObject, NSWindowDelegate {
     // Click ra ngoài panel → đóng.
     func windowDidResignKey(_ notification: Notification) {
         hide()
+    }
+
+    // MARK: - Xem trước cỡ lớn (Space)
+
+    private var isPreviewing: Bool { previewPanel.isVisible }
+
+    private func togglePreview() {
+        guard !isPreviewing else { return closePreview() }
+        guard viewModel.selectedItem != nil else { return }
+        let base = panel.frame
+        let screen = panel.screen?.visibleFrame ?? base
+        let width = min(Self.previewSize.width, screen.width - Self.margin * 2)
+        let height = min(Self.previewSize.height, screen.maxY - base.maxY - Self.margin)
+        previewPanel.setFrame(
+            NSRect(x: base.midX - width / 2, y: base.maxY - 6, width: width, height: height),
+            display: false)
+        previewPanel.orderFront(nil)
+    }
+
+    private func closePreview() {
+        guard isPreviewing else { return }
+        previewPanel.orderOut(nil)
+        previewLoader.clear()
     }
 
     // MARK: - Menu ghim (⌘P)
@@ -184,9 +218,18 @@ final class PanelController: NSObject, NSWindowDelegate {
             showPinMenu()
         case kVK_Tab:
             viewModel.cycleFilter(by: shift ? -1 : 1)
+        case kVK_Space where isPreviewing || (viewModel.query.isEmpty && !cmd):
+            // Ô tìm đang có chữ thì Space là dấu cách (ví dụ "da nang").
+            togglePreview()
         case kVK_Escape:
-            // Lần đầu xoá ô tìm kiếm, lần hai mới đóng.
-            if viewModel.query.isEmpty { hide() } else { viewModel.query = "" }
+            // Thứ tự: đóng xem trước → xoá ô tìm kiếm → đóng panel.
+            if isPreviewing {
+                closePreview()
+            } else if viewModel.query.isEmpty {
+                hide()
+            } else {
+                viewModel.query = ""
+            }
         case kVK_Return, kVK_ANSI_KeypadEnter:
             viewModel.pick(plainOnly: shift)
         case kVK_Delete where cmd:

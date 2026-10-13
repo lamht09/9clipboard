@@ -6,10 +6,19 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     private let statusItem: NSStatusItem
     private let privacy: PrivacyController
     private let openPanel: () -> Void
+    private let openSettings: () -> Void
+    private let clearHistory: () -> Void
 
-    init(privacy: PrivacyController, openPanel: @escaping () -> Void) {
+    init(
+        privacy: PrivacyController,
+        openPanel: @escaping () -> Void,
+        openSettings: @escaping () -> Void,
+        clearHistory: @escaping () -> Void
+    ) {
         self.privacy = privacy
         self.openPanel = openPanel
+        self.openSettings = openSettings
+        self.clearHistory = clearHistory
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.squareLength)
         super.init()
         let menu = NSMenu()
@@ -32,11 +41,12 @@ final class StatusItemController: NSObject, NSMenuDelegate {
     func menuNeedsUpdate(_ menu: NSMenu) {
         menu.removeAllItems()
 
-        let open = ClosureMenuItem(title: "Mở 9clipboard", key: "v") { [openPanel] in
+        let shortcut = HotkeyManager.shared.shortcut
+        let open = ClosureMenuItem(title: "Mở 9clipboard", key: shortcut?.menuKeyEquivalent ?? "") { [openPanel] in
             // Đợi menu đóng hẳn rồi mới mở panel, nếu không panel sẽ mất key ngay.
             DispatchQueue.main.async { openPanel() }
         }
-        open.keyEquivalentModifierMask = [.option]
+        open.keyEquivalentModifierMask = shortcut?.modifierFlags ?? []
         menu.addItem(open)
         menu.addItem(.separator())
 
@@ -60,6 +70,15 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         }
 
         menu.addItem(.separator())
+        // Hộp thoại/cửa sổ mở sau khi menu đóng hẳn.
+        menu.addItem(ClosureMenuItem(title: "Xoá lịch sử…") { [clearHistory] in
+            DispatchQueue.main.async { clearHistory() }
+        })
+        let settings = ClosureMenuItem(title: "Cài đặt…", key: ",") { [openSettings] in
+            DispatchQueue.main.async { openSettings() }
+        }
+        settings.keyEquivalentModifierMask = [.command]
+        menu.addItem(settings)
         menu.addItem(NSMenuItem(title: "Thoát", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
 
