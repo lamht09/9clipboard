@@ -33,12 +33,24 @@ struct CardStrip: View {
             let slots = viewModel.visibleRange().map { Slot(index: $0, item: items[$0]) }
             ZStack(alignment: .topLeading) {
                 ForEach(slots) { slot in
+                    let dragging = slot.index == viewModel.reorderIndex
                     CardView(item: slot.item, index: slot.index, isSelected: slot.index == viewModel.selectedIndex,
-                             previews: viewModel.previews, highlight: viewModel.activeQuery)
+                             previews: viewModel.previews, highlight: viewModel.activeQuery,
+                             pinboard: viewModel.pinboard(for: slot.item))
                         // Click một lần là dán luôn; rê chuột qua thì chọn.
                         .onTapGesture { viewModel.click(slot.item) }
-                        .onHover { inside in if inside { viewModel.select(slot.item) } }
-                        .offset(x: StripLayout.cardX(slot.index) - viewModel.scrollOffset,
+                        .onHover { inside in if inside && viewModel.reorderIndex == nil { viewModel.select(slot.item) } }
+                        .contextMenu { CardMenu(viewModel: viewModel, item: slot.item) }
+                        // Trong tab Pinboard, kéo thẻ để sắp xếp (kéo khoảng trống vẫn là cuộn).
+                        .gesture(
+                            DragGesture(minimumDistance: 4)
+                                .onChanged { viewModel.reorderChanged(index: slot.index, translation: $0.translation.width) }
+                                .onEnded { _ in viewModel.reorderEnded() },
+                            including: viewModel.canReorder ? .all : .subviews)
+                        .zIndex(dragging ? 1 : 0)
+                        .shadow(color: .black.opacity(dragging ? 0.3 : 0), radius: 10, y: 4)
+                        .offset(x: StripLayout.cardX(slot.index) - viewModel.scrollOffset
+                                    + viewModel.reorderOffset(for: slot.index),
                                 y: StripLayout.verticalInset)
                 }
             }

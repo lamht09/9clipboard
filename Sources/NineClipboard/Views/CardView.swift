@@ -11,6 +11,8 @@ struct CardView: View {
     let previews: PreviewCache
     /// Chuỗi tìm đang áp dụng; phần khớp được tô sáng.
     var highlight = ""
+    /// Bảng chứa thẻ (nếu đã ghim), để vẽ icon ghim theo màu bảng.
+    var pinboard: Pinboard?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -43,6 +45,12 @@ struct CardView: View {
             Text(item.kind.label)
                 .font(.system(size: 10, weight: .semibold))
             Spacer(minLength: 4)
+            if let pinboard {
+                Image(systemName: "pin.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color(hex: pinboard.color))
+                    .help(pinboard.name)
+            }
             if let icon = AppIconCache.icon(for: item.sourceBundleID) {
                 Image(nsImage: icon)
                     .resizable()

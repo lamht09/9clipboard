@@ -26,6 +26,23 @@ final class PanelViewModel {
     @ObservationIgnored private var cachedKey: ResultKey?
     @ObservationIgnored private var cachedItems: [ClipItem] = []
 
+    // MARK: Pinboard (M6)
+    /// Ô nhập tên bảng ngay trên thanh tab (tạo mới hoặc đổi tên). Không dùng NSAlert vì nó
+    /// phải kích hoạt app, làm app đang dùng mất focus.
+    var boardEditor: BoardEditor?
+    /// Thẻ đang được kéo để sắp xếp lại trong tab Pinboard.
+    private(set) var reorderIndex: Int?
+    private(set) var reorderTranslation: CGFloat = 0
+
+    struct BoardEditor {
+        enum Mode {
+            case create(pinning: ClipItem?)
+            case rename(Pinboard)
+        }
+        var mode: Mode
+        var name: String
+    }
+
     private struct ResultKey: Equatable {
         var revision: Int
         var query: String
@@ -60,9 +77,29 @@ final class PanelViewModel {
     var emptyMessage: String {
         if !activeQuery.isEmpty { return "Không tìm thấy “\(activeQuery)”" }
         if model.items.isEmpty { return "Chưa có gì trong lịch sử. Hãy copy thứ gì đó." }
+        if case .pinboard = filter { return "Bảng này chưa có mục nào. Chọn thẻ rồi bấm ⌘P để ghim." }
         return "Không có mục nào ở tab \(filter.label)"
     }
     var previews: PreviewCache { model.previews }
+    var pinboards: [Pinboard] { model.pinboards }
+
+    /// Các tab theo thứ tự `Tab`: theo loại, rồi tới từng Pinboard.
+    var filters: [ClipFilter] {
+        ClipFilter.kinds + pinboards.compactMap { $0.id.map(ClipFilter.pinboard) }
+    }
+
+    func pinboard(for item: ClipItem) -> Pinboard? { model.pinboard(id: item.pinboardID) }
+
+    func label(for filter: ClipFilter) -> String {
+        if case .pinboard(let id) = filter { return model.pinboard(id: id)?.name ?? filter.label }
+        return filter.label
+    }
+
+    /// Kéo thẻ để sắp xếp chỉ có ở tab Pinboard và khi không tìm kiếm (thứ tự lúc đó là `pin_order`).
+    var canReorder: Bool {
+        if case .pinboard = filter, activeQuery.isEmpty { return true }
+        return false
+    }
 
     var selectedItem: ClipItem? {
         items.indices.contains(selectedIndex) ? items[selectedIndex] : nil
@@ -71,6 +108,7 @@ final class PanelViewModel {
     func resetForOpen() {
         query = ""
         filter = .all
+        boardEditor = nil
         resetPosition()
         focusToken += 1
     }
@@ -103,9 +141,115 @@ final class PanelViewModel {
 
     /// `Tab` / `⇧Tab`: chuyển vòng qua các tab lọc.
     func cycleFilter(by delta: Int) {
-        let all = ClipFilter.allCases
+        let all = filters
         let index = all.firstIndex(of: filter) ?? 0
         filter = all[(index + delta + all.count) % all.count]
+    }
+
+    // MARK: - Ghim
+
+    func pin(_ item: ClipItem, to board: Pinboard) {
+        Task { await model.pin(item, to: board) }
+    }
+
+    func unpin(_ item: ClipItem) {
+        Task { await model.unpin(item) }
+    }
+
+    func startCreatingBoard(pinning item: ClipItem? = nil) {
+        boardEditor = BoardEditor(mode: .create(pinning: item), name: "")
+    }
+
+    func startRenaming(_ board: Pinboard) {
+        boardEditor = BoardEditor(mode: .rename(board), name: board.name)
+    }
+
+    func commitBoardEditor() {
+        guard let editor = boardEditor else { return }
+        boardEditor = nil
+        focusToken += 1
+        let name = editor.name.trimmingCharacters(in: .whitespacesAndNewlines)
+        switch editor.mode {
+        case .create(let item):
+            let finalName = !name.isEmpty ? name
+                : pinboards.isEmpty ? ClipboardStore.defaultPinboardName : "Bảng \(pinboards.count + 1)"
+            Task { await model.createPinboard(name: finalName, pinning: item) }
+        case .rename(var board):
+            guard !name.isEmpty, name != board.name else { return }
+            board.name = name
+            Task { await model.updatePinboard(board) }
+        }
+    }
+
+    func cancelBoardEditor() {
+        boardEditor = nil
+        focusToken += 1
+    }
+
+    func setColor(_ hex: String, for board: Pinboard) {
+        var board = board
+        board.color = hex
+        Task { await model.updatePinboard(board) }
+    }
+
+    func deleteBoard(_ board: Pinboard) {
+        if filter == board.id.map(ClipFilter.pinboard) { filter = .all }
+        Task { await model.deletePinboard(board) }
+    }
+
+    // MARK: - Sắp xếp trong Pinboard
+
+    /// `⌘←` / `⌘→`: đổi chỗ thẻ đang chọn với thẻ bên cạnh.
+    func moveSelectedPin(by delta: Int) {
+        guard canReorder, let item = selectedItem else { return }
+        let target = selectedIndex + delta
+        guard items.indices.contains(target) else { return }
+        selectedIndex = target
+        Task { await model.movePin(item, to: target) }
+    }
+
+    var reorderTarget: Int? {
+        guard let from = reorderIndex else { return nil }
+        let to = from + Int((reorderTranslation / StripLayout.step).rounded())
+        return min(max(to, 0), items.count - 1)
+    }
+
+    /// Độ lệch ngang của thẻ `index` khi đang kéo: thẻ được kéo theo chuột, các thẻ nằm giữa dịch sang nhường chỗ.
+    func reorderOffset(for index: Int) -> CGFloat {
+        guard let from = reorderIndex, let to = reorderTarget else { return 0 }
+        if index == from { return reorderTranslation }
+        if from < to, index > from, index <= to { return -StripLayout.step }
+        if to < from, index >= to, index < from { return StripLayout.step }
+        return 0
+    }
+
+    func reorderChanged(index: Int, translation: CGFloat) {
+        if reorderIndex == nil {
+            reorderIndex = index
+            selectedIndex = index
+        }
+        withAnimation(.easeOut(duration: 0.12)) { reorderTranslation = translation }
+    }
+
+    func reorderEnded() {
+        lastDragEnd = Date()
+        guard let from = reorderIndex, let to = reorderTarget, items.indices.contains(from) else {
+            reorderIndex = nil
+            return
+        }
+        let item = items[from]
+        guard to != from else {
+            withAnimation(.easeOut(duration: 0.15)) { reorderTranslation = 0 }
+            reorderIndex = nil
+            return
+        }
+        Task {
+            await model.movePin(item, to: to)
+            // Giữ độ lệch tới khi thứ tự mới đã nạp xong, để thẻ không nhảy về chỗ cũ trong chốc lát.
+            reorderIndex = nil
+            reorderTranslation = 0
+            selectedIndex = to
+        }
     }
 
     func move(by delta: Int) {
@@ -175,7 +319,7 @@ final class PanelViewModel {
 
     /// Click chuột: bỏ qua nếu đó là lúc thả chuột sau khi kéo, để kéo không bị dán nhầm.
     func click(_ item: ClipItem) {
-        guard dragStartOffset == nil, Date().timeIntervalSince(lastDragEnd) > 0.2 else { return }
+        guard dragStartOffset == nil, reorderIndex == nil, Date().timeIntervalSince(lastDragEnd) > 0.2 else { return }
         pick(item)
     }
 

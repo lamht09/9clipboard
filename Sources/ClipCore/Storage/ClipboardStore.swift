@@ -13,7 +13,7 @@ public actor ClipboardStore {
         }
     }
 
-    private let database: AppDatabase
+    let database: AppDatabase
     /// File ảnh; chỉ đọc nên dùng thẳng từ main thread được (ví dụ nạp thumbnail).
     public nonisolated let blobs: BlobStore
 
@@ -94,10 +94,16 @@ public actor ClipboardStore {
         return result
     }
 
-    /// Các mục mới dùng nhất trước.
+    /// Các mục mới dùng nhất trước, kèm mọi mục đã ghim (kể cả khi chúng cũ hơn `limit` mục gần nhất).
     public func recent(limit: Int = 2000) throws -> [ClipItem] {
         try database.queue.read { db in
-            try ClipItem.order(Column("last_used_at").desc).limit(limit).fetchAll(db)
+            let recent = try ClipItem.order(Column("last_used_at").desc).limit(limit).fetchAll(db)
+            guard recent.count == limit, let oldest = recent.last?.lastUsedAt else { return recent }
+            let olderPinned = try ClipItem
+                .filter(Column("pinboard_id") != nil && Column("last_used_at") < oldest.timeIntervalSince1970)
+                .order(Column("last_used_at").desc)
+                .fetchAll(db)
+            return recent + olderPinned
         }
     }
 

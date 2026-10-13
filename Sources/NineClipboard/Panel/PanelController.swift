@@ -111,11 +111,65 @@ final class PanelController: NSObject, NSWindowDelegate {
         hide()
     }
 
+    // MARK: - Menu ghim (⌘P)
+
+    /// Menu chọn Pinboard, hiện ngay dưới đầu thẻ đang chọn.
+    private func showPinMenu() {
+        guard let item = viewModel.selectedItem, let view = panel.contentView else { return }
+        let menu = NSMenu()
+        menu.autoenablesItems = false
+        let boards = viewModel.pinboards
+        for (i, board) in boards.enumerated() {
+            let entry = ClosureMenuItem(title: board.name, key: i < 9 ? "\(i + 1)" : "") { [viewModel] in
+                viewModel.pin(item, to: board)
+            }
+            entry.state = board.id == item.pinboardID ? .on : .off
+            entry.image = Self.dot(hex: board.color)
+            menu.addItem(entry)
+        }
+        if boards.isEmpty {
+            // Chưa có bảng nào: mục đầu tiên tạo luôn bảng mặc định.
+            menu.addItem(ClosureMenuItem(title: ClipboardStore.defaultPinboardName, key: "1") { [model] in
+                Task { await model.createPinboard(name: ClipboardStore.defaultPinboardName, pinning: item) }
+            })
+        }
+        menu.addItem(.separator())
+        menu.addItem(ClosureMenuItem(title: "Bảng mới…", key: "n") { [viewModel] in
+            viewModel.startCreatingBoard(pinning: item)
+        })
+        if item.isPinned {
+            menu.addItem(ClosureMenuItem(title: "Bỏ ghim", key: "\u{8}") { [viewModel] in viewModel.unpin(item) })
+        }
+
+        let cardX = StripLayout.cardX(viewModel.selectedIndex) - viewModel.scrollOffset
+        let cardTop = PanelLayout.barTop + PanelLayout.barHeight + StripLayout.verticalInset + 24
+        let point = NSPoint(x: cardX + 8, y: view.isFlipped ? cardTop : view.bounds.height - cardTop)
+        menu.popUp(positioning: nil, at: point, in: view)
+    }
+
+    private static func dot(hex: String) -> NSImage {
+        NSImage(size: NSSize(width: 10, height: 10), flipped: false) { rect in
+            NSColor(Color(hex: hex)).setFill()
+            NSBezierPath(ovalIn: rect.insetBy(dx: 1, dy: 1)).fill()
+            return true
+        }
+    }
+
     // MARK: - Bàn phím (DESIGN §6.2)
 
     private func handleKey(_ event: NSEvent) -> Bool {
         // Bộ gõ đang soạn chữ (ví dụ Telex của hệ thống): để ô tìm kiếm tự xử lý Enter/Esc/mũi tên.
         if let editor = panel.firstResponder as? NSTextView, editor.hasMarkedText() { return false }
+
+        // Đang nhập tên Pinboard: chỉ bắt Enter/Esc, các phím khác vào ô nhập.
+        if viewModel.boardEditor != nil {
+            switch Int(event.keyCode) {
+            case kVK_Return, kVK_ANSI_KeypadEnter: viewModel.commitBoardEditor()
+            case kVK_Escape: viewModel.cancelBoardEditor()
+            default: return false
+            }
+            return true
+        }
 
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         let cmd = flags.contains(.command)
@@ -123,9 +177,11 @@ final class PanelController: NSObject, NSWindowDelegate {
 
         switch Int(event.keyCode) {
         case kVK_LeftArrow:
-            viewModel.move(by: -1)
+            cmd && viewModel.canReorder ? viewModel.moveSelectedPin(by: -1) : viewModel.move(by: -1)
         case kVK_RightArrow:
-            viewModel.move(by: 1)
+            cmd && viewModel.canReorder ? viewModel.moveSelectedPin(by: 1) : viewModel.move(by: 1)
+        case kVK_ANSI_P where cmd:
+            showPinMenu()
         case kVK_Tab:
             viewModel.cycleFilter(by: shift ? -1 : 1)
         case kVK_Escape:

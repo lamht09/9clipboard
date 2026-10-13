@@ -1,15 +1,21 @@
 import Foundation
 
-/// Tab lọc trong panel. Pinboard sẽ thêm ở M6.
-public enum ClipFilter: Hashable, Sendable, CaseIterable {
+/// Tab lọc trong panel: theo loại, hoặc theo một Pinboard.
+public enum ClipFilter: Hashable, Sendable {
     case all, text, link, image
+    case pinboard(Int64)
 
+    /// Các tab theo loại, đứng trước các tab Pinboard.
+    public static let kinds: [ClipFilter] = [.all, .text, .link, .image]
+
+    /// Tên tab theo loại; tab Pinboard lấy tên bảng.
     public var label: String {
         switch self {
         case .all: "Tất cả"
         case .text: "Text"
         case .link: "Link"
         case .image: "Ảnh"
+        case .pinboard: "Pinboard"
         }
     }
 
@@ -19,6 +25,7 @@ public enum ClipFilter: Hashable, Sendable, CaseIterable {
         case .text: item.kind == .text || item.kind == .rich
         case .link: item.kind == .link
         case .image: item.kind == .image
+        case .pinboard(let id): item.pinboardID == id
         }
     }
 }
@@ -35,9 +42,13 @@ public final class SearchEngine {
 
     public init() {}
 
-    /// `items` đã sắp theo `last_used_at` giảm dần. Chuỗi tìm trống thì chỉ lọc, giữ nguyên thứ tự.
+    /// `items` đã sắp theo `last_used_at` giảm dần. Chuỗi tìm trống thì chỉ lọc, giữ nguyên thứ tự
+    /// (tab Pinboard thì theo `pin_order`).
     public func search(_ items: [ClipItem], query: String, filter: ClipFilter) -> [Result] {
-        let filtered = items.filter(filter.includes)
+        var filtered = items.filter(filter.includes)
+        if case .pinboard = filter {
+            filtered.sort { ($0.pinOrder ?? .max, $0.id ?? 0) < ($1.pinOrder ?? .max, $1.id ?? 0) }
+        }
         let q = FuzzyMatcher.scalars(TextNormalizer.normalize(query))
         guard !q.isEmpty else { return filtered.map { Result(item: $0, score: 0) } }
 
