@@ -42,7 +42,7 @@ extension ClipboardStore {
         }
     }
 
-    /// Ghim vào cuối bảng. Đã ở đúng bảng đó thì giữ nguyên vị trí.
+    /// Ghim vào cuối bảng. Đã ở đúng bảng đó thì giữ nguyên vị trí. Ghim cũng là giữ lại (bỏ hạn tự xoá).
     public func pin(itemID: Int64, to boardID: Int64) throws {
         try database.queue.write { db in
             let current = try Int64.fetchOne(db, sql: "SELECT pinboard_id FROM clip_item WHERE id = ?", arguments: [itemID])
@@ -50,7 +50,7 @@ extension ClipboardStore {
             let maxOrder = try Int.fetchOne(
                 db, sql: "SELECT MAX(pin_order) FROM clip_item WHERE pinboard_id = ?", arguments: [boardID]) ?? -1
             try db.execute(
-                sql: "UPDATE clip_item SET pinboard_id = ?, pin_order = ? WHERE id = ?",
+                sql: "UPDATE clip_item SET pinboard_id = ?, pin_order = ?, expires_at = NULL WHERE id = ?",
                 arguments: [boardID, maxOrder + 1, itemID])
         }
     }

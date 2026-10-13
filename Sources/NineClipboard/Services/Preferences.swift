@@ -1,4 +1,3 @@
-import ClipCore
 import Foundation
 
 /// Cài đặt lưu trong UserDefaults (DESIGN §4).
@@ -10,9 +9,9 @@ enum Preferences {
         defaults.register(defaults: [
             Key.historyLimit: 500,
             Key.autoPaste: true,
-            Key.ignoreConcealed: true,
+            Key.detectPasswords: true,
+            Key.passwordLifetimeMinutes: 15,
             Key.maxImageMB: 20,
-            Key.excludedBundleIDs: PrivacyFilter.defaultExcludedBundleIDs,
         ])
     }
 
@@ -21,7 +20,8 @@ enum Preferences {
         static let autoPaste = "autoPaste"
         static let launchAtLogin = "launchAtLogin"
         static let excludedBundleIDs = "excludedBundleIDs"
-        static let ignoreConcealed = "ignoreConcealed"
+        static let detectPasswords = "detectPasswords"
+        static let passwordLifetimeMinutes = "passwordLifetimeMinutes"
         static let pausedUntil = "pausedUntil"
         static let maxImageMB = "maxImageMB"
     }
@@ -41,9 +41,16 @@ enum Preferences {
         set { defaults.set(newValue, forKey: Key.autoPaste) }
     }
 
-    static var ignoreConcealed: Bool {
-        get { defaults.bool(forKey: Key.ignoreConcealed) }
-        set { defaults.set(newValue, forKey: Key.ignoreConcealed) }
+    /// Nhận diện mật khẩu (type Concealed, app quản lý mật khẩu) để tự xoá sau `passwordLifetimeMinutes`.
+    static var detectPasswords: Bool {
+        get { defaults.bool(forKey: Key.detectPasswords) }
+        set { defaults.set(newValue, forKey: Key.detectPasswords) }
+    }
+
+    /// Mật khẩu tự xoá sau bao nhiêu phút nếu người dùng không giữ lại. Sửa được ở Settings (M8).
+    static var passwordLifetimeMinutes: Int {
+        get { max(1, defaults.integer(forKey: Key.passwordLifetimeMinutes)) }
+        set { defaults.set(newValue, forKey: Key.passwordLifetimeMinutes) }
     }
 
     static var excludedBundleIDs: [String] {

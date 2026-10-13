@@ -25,11 +25,13 @@ public actor ClipboardStore {
     /// Lưu lần copy mới. Nếu nội dung đã có thì chỉ đưa mục đó lên đầu.
     /// Ảnh được ghi ra `blobs/` (ném `BlobStore.Error.tooLarge` nếu vượt `maxImageBytes`) và tạo thumbnail.
     /// Sau đó áp dụng retention theo `historyLimit` và dọn file của các mục bị xoá.
+    /// `expiresAt`: lần copy nhạy cảm, tự xoá lúc đó. Copy lại thì gia hạn, trừ khi mục đã được giữ lại.
     @discardableResult
     public func insertOrBump(
         _ capture: Capture,
         historyLimit: Int,
         maxImageBytes: Int = .max,
+        expiresAt: Date? = nil,
         now: Date = Date()
     ) throws -> InsertResult {
         let hash = capture.contentHash
@@ -38,6 +40,7 @@ public actor ClipboardStore {
                 existing.lastUsedAt = now
                 existing.sourceBundleID = capture.sourceBundleID ?? existing.sourceBundleID
                 existing.sourceAppName = capture.sourceAppName ?? existing.sourceAppName
+                if existing.expiresAt != nil, let expiresAt { existing.expiresAt = expiresAt }
                 try existing.update(db)
                 return (.bumped(existing), [], [])
             }
@@ -57,7 +60,8 @@ public actor ClipboardStore {
                 lastUsedAt: now,
                 useCount: 0,
                 pinboardID: nil,
-                pinOrder: nil
+                pinOrder: nil,
+                expiresAt: expiresAt
             )
             try item.insert(db)
             guard let id = item.id else { throw DatabaseError(message: "missing rowid") }
@@ -141,6 +145,31 @@ public actor ClipboardStore {
                 sql: "UPDATE clip_item SET last_used_at = ?, use_count = use_count + 1 WHERE id = ?",
                 arguments: [now.timeIntervalSince1970, id])
         }
+    }
+
+    /// Giữ lại mục nhạy cảm: bỏ hạn tự xoá.
+    public func keep(itemID: Int64) throws {
+        try database.queue.write { db in
+            try db.execute(sql: "UPDATE clip_item SET expires_at = NULL WHERE id = ?", arguments: [itemID])
+        }
+    }
+
+    /// Xoá các mục đã hết hạn (kèm file ảnh). Trả về số mục bị xoá.
+    @discardableResult
+    public func purgeExpired(now: Date = Date()) throws -> Int {
+        let (count, blobPaths) = try database.queue.write { db -> (Int, [String]) in
+            let expired = ClipItem.filter(Column("expires_at") != nil && Column("expires_at") <= now.timeIntervalSince1970)
+            let ids = try expired.select(Column("id"), as: Int64.self).fetchAll(db)
+            guard !ids.isEmpty else { return (0, []) }
+            let blobPaths = try Representation
+                .filter(ids.contains(Column("item_id")) && Column("blob_path") != nil)
+                .select(Column("blob_path"), as: String.self)
+                .fetchAll(db)
+            try expired.deleteAll(db)
+            return (ids.count, blobPaths)
+        }
+        blobs.delete(blobPaths: blobPaths)
+        return count
     }
 
     public func applyRetention(limit: Int) throws {

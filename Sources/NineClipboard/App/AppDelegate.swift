@@ -35,13 +35,14 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             log.error("Không đăng ký được phím tắt ⌥V")
         }
 
-        let monitor = ClipboardMonitor(privacy: privacy) { capture in
-            Task { await model.ingest(capture) }
+        let monitor = ClipboardMonitor(privacy: privacy) { capture, sensitive in
+            Task { await model.ingest(capture, sensitive: sensitive) }
         }
         monitor.start()
         self.monitor = monitor
 
-        Task { await model.reload() }
+        model.startExpiryTimer()
+        Task { await model.purgeExpired() }
         PermissionService.showOnboardingIfNeeded()
     }
 }

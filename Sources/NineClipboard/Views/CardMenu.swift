@@ -11,6 +11,13 @@ struct CardActionBar: View {
 
     var body: some View {
         HStack(spacing: 2) {
+            if let expiresAt = item.expiresAt {
+                // Mật khẩu: bấm để giữ lại, không thì tự xoá khi hết hạn. Ghim cũng là giữ lại.
+                action("lock.open", help: "Giữ lại · nếu không sẽ tự xoá \(ExpiryText.string(until: expiresAt))") {
+                    viewModel.keep(item)
+                }
+                .foregroundStyle(Color.orange)
+            }
             // Bấm: ghim nhanh vào "Đã ghim" / bỏ ghim. Chuột phải: chọn bảng khác.
             action(pinboard == nil ? "pin" : "pin.fill",
                    help: pinboard.map { "Bỏ ghim khỏi \($0.name) · chuột phải để chuyển bảng" }
@@ -72,6 +79,9 @@ struct CardMenu: View {
         }
         Divider()
         Menu("Ghim vào") { PinMenuItems(viewModel: viewModel, item: item) }
+        if item.isExpiring {
+            Button("Giữ lại (không tự xoá)") { viewModel.keep(item) }
+        }
         Divider()
         Button("Xoá") { viewModel.delete(item) }
     }

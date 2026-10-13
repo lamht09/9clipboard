@@ -40,25 +40,22 @@ final class PrivacyController {
         onChange()
     }
 
-    /// Trả về true nếu nên ghi lần copy này. Tiêu lượt "bỏ qua lần tiếp theo" nếu có.
-    func shouldRecord(types: [String], sourceBundleID: String?) -> Bool {
+    /// Quyết định cho lần copy này. Tiêu lượt "bỏ qua lần tiếp theo" nếu có.
+    func evaluate(types: [String], sourceBundleID: String?) -> PrivacyFilter.Decision {
         let filter = PrivacyFilter(
-            ignoreSensitiveTypes: Preferences.ignoreConcealed,
+            detectPasswords: Preferences.detectPasswords,
             excludedBundleIDs: Set(Preferences.excludedBundleIDs),
             pausedUntil: pausedUntil,
             skipNext: skipNext)
         let decision = filter.evaluate(types: types, sourceBundleID: sourceBundleID)
-        switch decision {
-        case .record:
-            return true
-        case .skippedOnce:
+        if decision == .skippedOnce {
             skipNext = false
             onChange()
-        case .paused, .sensitive, .excludedApp:
-            break
         }
-        log.debug("bỏ qua lần copy: \(String(describing: decision))")
-        return false
+        if decision != .record {
+            log.debug("lần copy: \(String(describing: decision))")
+        }
+        return decision
     }
 
     /// Hẹn giờ tự bật lại, để icon đổi về đúng lúc kể cả khi không có lần copy nào.

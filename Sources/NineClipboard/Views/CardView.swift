@@ -63,6 +63,12 @@ struct CardView: View {
     @ViewBuilder
     private var passiveBadges: some View {
         Group {
+            if item.isExpiring {
+                Image(systemName: "lock.fill")
+                    .font(.system(size: 9))
+                    .foregroundStyle(Color.orange)
+                    .help("Mật khẩu: tự xoá nếu không giữ lại")
+            }
             if let pinboard {
                 Image(systemName: "pin.fill")
                     .font(.system(size: 9))
@@ -123,7 +129,15 @@ struct CardView: View {
 
     private var footer: some View {
         HStack {
-            Text(RelativeTime.string(for: item.lastUsedAt))
+            if let expiresAt = item.expiresAt {
+                // Đếm ngược tới lúc tự xoá; tự cập nhật mỗi 15s khi panel đang mở.
+                TimelineView(.periodic(from: .now, by: 15)) { context in
+                    Text("xoá \(ExpiryText.string(until: expiresAt, now: context.date))")
+                        .foregroundStyle(Color.orange)
+                }
+            } else {
+                Text(RelativeTime.string(for: item.lastUsedAt))
+            }
             if let w = item.imageWidth, let h = item.imageHeight {
                 Text("\(w)×\(h)")
             }
@@ -201,6 +215,16 @@ enum CodeApps {
     static func isCodeApp(_ bundleID: String?) -> Bool {
         guard let bundleID else { return false }
         return bundleIDs.contains(bundleID) || bundleID.hasPrefix("com.jetbrains.")
+    }
+}
+
+enum ExpiryText {
+    /// "sau 12 phút" / "sau 40 giây" / "ngay".
+    static func string(until date: Date, now: Date = Date()) -> String {
+        let seconds = date.timeIntervalSince(now)
+        if seconds <= 0 { return "ngay" }
+        if seconds < 60 { return "sau \(Int(seconds)) giây" }
+        return "sau \(Int((seconds / 60).rounded(.up))) phút"
     }
 }
 

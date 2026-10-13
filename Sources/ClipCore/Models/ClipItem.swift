@@ -21,8 +21,11 @@ public struct ClipItem: Codable, Sendable, Identifiable, Hashable {
     public var useCount: Int
     public var pinboardID: Int64?
     public var pinOrder: Int?
+    /// Mục nhạy cảm (mật khẩu) tự xoá lúc này nếu người dùng không giữ lại. `nil` = giữ vĩnh viễn.
+    public var expiresAt: Date? = nil
 
     public var isPinned: Bool { pinboardID != nil }
+    public var isExpiring: Bool { expiresAt != nil }
 
     enum CodingKeys: String, CodingKey {
         case id, kind
@@ -39,6 +42,7 @@ public struct ClipItem: Codable, Sendable, Identifiable, Hashable {
         case useCount = "use_count"
         case pinboardID = "pinboard_id"
         case pinOrder = "pin_order"
+        case expiresAt = "expires_at"
     }
 }
 

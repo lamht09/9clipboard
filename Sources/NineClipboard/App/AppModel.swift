@@ -31,12 +31,15 @@ final class AppModel {
         }
     }
 
-    func ingest(_ capture: Capture) async {
+    /// `sensitive`: mật khẩu, tự xoá sau `Preferences.passwordLifetimeMinutes` nếu không được giữ lại.
+    func ingest(_ capture: Capture, sensitive: Bool = false) async {
+        let lifetime = TimeInterval(Preferences.passwordLifetimeMinutes * 60)
         do {
             try await store.insertOrBump(
                 capture,
                 historyLimit: Preferences.historyLimit,
-                maxImageBytes: Preferences.maxImageMB * 1024 * 1024)
+                maxImageBytes: Preferences.maxImageMB * 1024 * 1024,
+                expiresAt: sensitive ? Date().addingTimeInterval(lifetime) : nil)
         } catch BlobStore.Error.tooLarge(let bytes) {
             log.notice("bỏ qua ảnh \(bytes / 1024 / 1024) MB, vượt giới hạn \(Preferences.maxImageMB) MB")
             return
@@ -49,6 +52,39 @@ final class AppModel {
     func delete(_ item: ClipItem) async {
         guard let id = item.id else { return }
         await perform("delete") { try await $0.delete(id: id) }
+    }
+
+    // MARK: - Mục tự xoá (mật khẩu)
+
+    private var expiryTimer: Timer?
+
+    /// Mỗi 15s xoá các mục đã hết hạn; chỉ nạp lại khi thật sự có mục bị xoá.
+    func startExpiryTimer() {
+        guard expiryTimer == nil else { return }
+        let timer = Timer(timeInterval: 15, repeats: true) { [weak self] _ in
+            MainActor.assumeIsolated {
+                guard let self, self.items.contains(where: \.isExpiring) else { return }
+                Task { await self.purgeExpired() }
+            }
+        }
+        timer.tolerance = 3
+        RunLoop.main.add(timer, forMode: .common)
+        expiryTimer = timer
+    }
+
+    func purgeExpired() async {
+        do {
+            let purged = try await store.purgeExpired()
+            if purged > 0 || revision == 0 { await reload() }
+        } catch {
+            log.error("purgeExpired failed: \(error.localizedDescription)")
+        }
+    }
+
+    /// Giữ lại mục mật khẩu: không tự xoá nữa.
+    func keep(_ item: ClipItem) async {
+        guard let id = item.id else { return }
+        await perform("keep") { try await $0.keep(itemID: id) }
     }
 
     // MARK: - Pinboard (M6)

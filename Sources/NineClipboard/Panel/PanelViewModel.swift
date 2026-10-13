@@ -167,6 +167,11 @@ final class PanelViewModel {
         item.isPinned ? unpin(item) : pinToDefaultBoard(item)
     }
 
+    /// Giữ lại mục mật khẩu (không tự xoá nữa).
+    func keep(_ item: ClipItem) {
+        Task { await model.keep(item) }
+    }
+
     func unpin(_ item: ClipItem) {
         Task { await model.unpin(item) }
     }

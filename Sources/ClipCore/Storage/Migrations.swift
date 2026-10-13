@@ -41,6 +41,14 @@ enum Migrations {
             }
         }
 
+        // Mục nhạy cảm tự xoá sau một khoảng thời gian.
+        migrator.registerMigration("v2") { db in
+            try db.alter(table: "clip_item") { t in
+                t.add(column: "expires_at", .double)
+            }
+            try db.create(index: "idx_clip_expires", on: "clip_item", columns: ["expires_at"])
+        }
+
         return migrator
     }
 }
