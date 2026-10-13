@@ -10,10 +10,12 @@ let log = Logger(subsystem: "com.9clipboard.app", category: "app")
 @Observable
 final class AppModel {
     let store: ClipboardStore
+    let previews: PreviewCache
     private(set) var items: [ClipItem] = []
 
     init(store: ClipboardStore) {
         self.store = store
+        previews = PreviewCache(store: store)
     }
 
     func reload() async {
@@ -26,7 +28,13 @@ final class AppModel {
 
     func ingest(_ capture: Capture) async {
         do {
-            try await store.insertOrBump(capture, historyLimit: Preferences.historyLimit)
+            try await store.insertOrBump(
+                capture,
+                historyLimit: Preferences.historyLimit,
+                maxImageBytes: Preferences.maxImageMB * 1024 * 1024)
+        } catch BlobStore.Error.tooLarge(let bytes) {
+            log.notice("bỏ qua ảnh \(bytes / 1024 / 1024) MB, vượt giới hạn \(Preferences.maxImageMB) MB")
+            return
         } catch {
             log.error("insert failed: \(error.localizedDescription)")
         }

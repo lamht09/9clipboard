@@ -26,6 +26,7 @@ final class PanelViewModel {
     }
 
     var items: [ClipItem] { model.items }
+    var previews: PreviewCache { model.previews }
 
     var selectedItem: ClipItem? {
         items.indices.contains(selectedIndex) ? items[selectedIndex] : nil

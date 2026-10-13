@@ -15,7 +15,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         do {
             let dir = try DataDirectory.url()
             let database = try AppDatabase.onDisk(at: dir.appendingPathComponent("clips.sqlite"))
-            model = AppModel(store: ClipboardStore(database: database))
+            let blobs = try BlobStore(root: dir)
+            model = AppModel(store: ClipboardStore(database: database, blobs: blobs))
         } catch {
             fatalError("Không mở được database: \(error)")
         }

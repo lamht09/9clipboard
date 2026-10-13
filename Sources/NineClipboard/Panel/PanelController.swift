@@ -37,7 +37,8 @@ final class PanelController: NSObject, NSWindowDelegate {
         guard let id = item.id else { return }
         Task {
             let reps = (try? await model.store.representations(itemID: id)) ?? []
-            PasteService.write(item, representations: reps, plainOnly: plainOnly)
+            let blobs = model.store.blobs
+            PasteService.write(item, representations: reps, blobLoader: blobs.load, plainOnly: plainOnly)
             // Đóng ngay (không animation) để panel nhả bàn phím trước khi ⌘V được gửi.
             hide(animated: false)
             if Preferences.autoPaste {

@@ -5,15 +5,13 @@ import ClipCore
 @MainActor
 enum PasteService {
     /// Ghi item lên pasteboard kèm marker để `ClipboardMonitor` bỏ qua.
-    /// `plainOnly`: chỉ ghi `public.utf8-plain-text`, bỏ định dạng.
+    /// `plainOnly`: chỉ ghi `public.utf8-plain-text`, bỏ định dạng (ảnh không có text thì vẫn dán ảnh).
     static func write(_ item: ClipItem, representations: [Representation], blobLoader: (String) -> Data? = { _ in nil }, plainOnly: Bool) {
         let pb = NSPasteboard.general
         pb.clearContents()
 
-        if plainOnly {
-            if let text = item.plainText {
-                pb.setString(text, forType: .string)
-            }
+        if plainOnly, let text = item.plainText {
+            pb.setString(text, forType: .string)
         } else {
             for rep in representations {
                 let data = rep.data ?? rep.blobPath.flatMap(blobLoader)

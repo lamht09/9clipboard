@@ -14,7 +14,9 @@ let package = Package(
     targets: [
         .target(
             name: "ClipCore",
-            dependencies: [.product(name: "GRDB", package: "GRDB.swift")]
+            dependencies: [.product(name: "GRDB", package: "GRDB.swift")],
+            // NSAttributedString(rtf:) là category của AppKit; bundle test không tự nạp AppKit.
+            linkerSettings: [.linkedFramework("AppKit")]
         ),
         .executableTarget(
             name: "NineClipboard",

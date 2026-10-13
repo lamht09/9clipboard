@@ -33,7 +33,8 @@ struct CardStrip: View {
             let slots = viewModel.visibleRange().map { Slot(index: $0, item: items[$0]) }
             ZStack(alignment: .topLeading) {
                 ForEach(slots) { slot in
-                    CardView(item: slot.item, index: slot.index, isSelected: slot.index == viewModel.selectedIndex)
+                    CardView(item: slot.item, index: slot.index, isSelected: slot.index == viewModel.selectedIndex,
+                             previews: viewModel.previews)
                         // Click một lần là dán luôn; rê chuột qua thì chọn.
                         .onTapGesture { viewModel.click(slot.item) }
                         .onHover { inside in if inside { viewModel.select(slot.item) } }

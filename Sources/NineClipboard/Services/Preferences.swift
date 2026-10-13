@@ -29,6 +29,11 @@ enum Preferences {
         set { defaults.set(newValue, forKey: Key.historyLimit) }
     }
 
+    static var maxImageMB: Int {
+        get { defaults.integer(forKey: Key.maxImageMB) }
+        set { defaults.set(newValue, forKey: Key.maxImageMB) }
+    }
+
     static var autoPaste: Bool {
         get { defaults.bool(forKey: Key.autoPaste) }
         set { defaults.set(newValue, forKey: Key.autoPaste) }
