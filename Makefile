@@ -1,5 +1,8 @@
 APP      := build/9clipboard.app
 IDENTITY := 9clipboard Dev
+# swift-build trên Command Line Tools đôi khi quên nạp plugin macro của swift-testing → nạp tường minh.
+TOOLCHAIN   := $(shell dirname $$(dirname $$(xcrun --find swift)))
+TEST_FLAGS  := -Xswiftc -plugin-path -Xswiftc $(TOOLCHAIN)/lib/swift/host/plugins/testing
 
 .PHONY: build bundle sign run test install cert clean
 
@@ -17,7 +20,7 @@ run: sign
 	open $(APP)
 
 test:
-	swift test
+	swift test $(TEST_FLAGS)
 
 install: sign
 	-pkill -x NineClipboard
