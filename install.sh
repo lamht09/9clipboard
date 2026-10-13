@@ -37,7 +37,7 @@ main() {
   trap 'rm -rf "$tmp"' EXIT
 
   say "Downloading 9clipboard $version"
-  curl -fL --progress-bar -o "$tmp/app.zip" \
+  curl -fsL -o "$tmp/app.zip" \
     "https://github.com/$REPO/releases/download/v$version/9clipboard-$version.zip" \
     || die "Download failed. Is $version a valid version?"
   ditto -x -k "$tmp/app.zip" "$tmp"
