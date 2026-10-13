@@ -5,6 +5,7 @@ import ClipCore
 final class AppDelegate: NSObject, NSApplicationDelegate {
     private var model: AppModel?
     private var monitor: ClipboardMonitor?
+    private var privacy: PrivacyController?
     private var statusItemController: StatusItemController?
     private var panelController: PanelController?
 
@@ -24,13 +25,17 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
 
         let panelController = PanelController(model: model)
         self.panelController = panelController
-        statusItemController = StatusItemController(openPanel: { panelController.show() })
+        let privacy = PrivacyController()
+        self.privacy = privacy
+        let statusItemController = StatusItemController(privacy: privacy, openPanel: { panelController.show() })
+        self.statusItemController = statusItemController
+        privacy.onChange = { statusItemController.updateIcon() }
 
         if !HotkeyManager.shared.register(.default, action: { panelController.toggle() }) {
             log.error("Không đăng ký được phím tắt ⌥V")
         }
 
-        let monitor = ClipboardMonitor { capture in
+        let monitor = ClipboardMonitor(privacy: privacy) { capture in
             Task { await model.ingest(capture) }
         }
         monitor.start()

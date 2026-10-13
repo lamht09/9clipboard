@@ -1,3 +1,4 @@
+import ClipCore
 import Foundation
 
 /// Cài đặt lưu trong UserDefaults (DESIGN §4).
@@ -11,6 +12,7 @@ enum Preferences {
             Key.autoPaste: true,
             Key.ignoreConcealed: true,
             Key.maxImageMB: 20,
+            Key.excludedBundleIDs: PrivacyFilter.defaultExcludedBundleIDs,
         ])
     }
 
@@ -37,5 +39,20 @@ enum Preferences {
     static var autoPaste: Bool {
         get { defaults.bool(forKey: Key.autoPaste) }
         set { defaults.set(newValue, forKey: Key.autoPaste) }
+    }
+
+    static var ignoreConcealed: Bool {
+        get { defaults.bool(forKey: Key.ignoreConcealed) }
+        set { defaults.set(newValue, forKey: Key.ignoreConcealed) }
+    }
+
+    static var excludedBundleIDs: [String] {
+        get { defaults.stringArray(forKey: Key.excludedBundleIDs) ?? [] }
+        set { defaults.set(newValue, forKey: Key.excludedBundleIDs) }
+    }
+
+    static var pausedUntil: Date? {
+        get { defaults.object(forKey: Key.pausedUntil) as? Date }
+        set { defaults.set(newValue, forKey: Key.pausedUntil) }
     }
 }
