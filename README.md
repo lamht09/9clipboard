@@ -1,64 +1,72 @@
 # 9clipboard
 
-Trình quản lý lịch sử clipboard cho macOS (Apple Silicon), dùng cá nhân. Bấm **⌥V** để mở dải thẻ ở đáy màn hình, chọn một thẻ là dán luôn vào app đang dùng.
+**English** · [Tiếng Việt](README.vi.md)
 
-- Lưu text, rich text và ảnh; tìm fuzzy không dấu tiếng Việt (`da nang` → “Đà Nẵng”)
-- Ghim vào các Pinboard, mục đã ghim không bị xoá
-- Mật khẩu (từ 1Password, Passwords…) tự xoá sau 15 phút; loại trừ app, tạm dừng ghi
-- Dữ liệu chỉ nằm trên máy, không có network
+A clipboard history manager for macOS (Apple Silicon). Press **⌥V** to open a strip of cards at the bottom of the screen; pick a card and it is pasted straight into the app you are using.
 
-Thiết kế: [docs/DESIGN.md](docs/DESIGN.md) · Kế hoạch: [docs/PLAN.md](docs/PLAN.md) · Tiến độ: [docs/STATE.md](docs/STATE.md)
+- Keeps text, rich text and images; fuzzy, accent-insensitive search (typing `da nang` finds “Đà Nẵng”)
+- Pin items to Pinboards; pinned items are never deleted
+- Passwords (from 1Password, Passwords…) are removed after 15 minutes; exclude apps, pause recording
+- All data stays on your Mac — no network access
 
-## Yêu cầu
+Docs (in Vietnamese): [design](docs/DESIGN.md) · [plan](docs/PLAN.md) · [status](docs/STATE.md)
 
-- macOS 14 trở lên, Apple Silicon (mọi máy Apple Silicon, kể cả M1, đều cập nhật được lên macOS 14)
-- Swift 6 (Command Line Tools là đủ, không cần Xcode): `xcode-select --install`
+## Requirements
 
-## Build và cài
+- macOS 14 or later on Apple Silicon (every Apple Silicon Mac, including M1, can update to macOS 14)
+- Swift 6 — the Command Line Tools are enough, no Xcode needed: `xcode-select --install`
+
+## Build and install
+
+Clone the repo, then:
 
 ```sh
-make cert      # chỉ chạy một lần: tạo chứng chỉ tự ký "9clipboard Dev" trong Keychain
-make install   # build release, ký, copy vào /Applications và mở app
+make cert      # once: creates a self-signed "9clipboard Dev" certificate in your Keychain
+make install   # builds release, signs, copies to /Applications and launches the app
 ```
 
-Các lệnh khác:
+Other commands:
 
-| Lệnh | Việc |
+| Command | What it does |
 |---|---|
-| `make run` | Build, ký và chạy từ `build/9clipboard.app` |
-| `make test` | Chạy unit test của `ClipCore` (đừng dùng `swift test` trần, xem STATE.md) |
-| `make bench` | Đo tìm kiếm 2000 mục ở bản release (mục tiêu < 10ms) |
-| `scripts/make-icon.sh` | Vẽ lại `Resources/AppIcon.icns` |
+| `make run` | Build, sign and run from `build/9clipboard.app` |
+| `make test` | Run the `ClipCore` unit tests (don't use plain `swift test`, see `docs/STATE.md`) |
+| `make bench` | Benchmark search over 2,000 items in a release build (target < 10 ms) |
+| `scripts/make-icon.sh` | Redraw `Resources/AppIcon.icns` |
 
-**Vì sao cần chứng chỉ tự ký:** macOS nhớ quyền Trợ năng theo chữ ký của app. Ký ad-hoc thì mỗi lần build là một chữ ký mới và quyền bị mất; ký bằng cùng một chứng chỉ thì quyền được giữ.
+**Why a self-signed certificate:** macOS remembers the Accessibility permission by the app's signature. With ad-hoc signing every build gets a new signature and the permission is lost; signing with the same certificate keeps it.
 
-## Cấp quyền
+## Permissions
 
-Lần đầu chạy, app xin quyền **Trợ năng (Accessibility)** để gửi phím ⌘V vào app đang dùng:
+On first launch the app asks for **Accessibility** permission so it can send ⌘V to the active app:
 
-System Settings › Quyền riêng tư & Bảo mật › Trợ năng › bật **9clipboard**.
+System Settings › Privacy & Security › Accessibility › enable **9clipboard**.
 
-Không cấp cũng dùng được: chọn thẻ thì nội dung được copy, bạn tự bấm ⌘V. Trạng thái quyền xem ở Cài đặt › Quyền.
+It still works without it: choosing a card copies its content and you press ⌘V yourself. Check the permission status under Settings › Permissions.
 
-## Phím tắt trong panel
+## Panel shortcuts
 
-| Phím | Việc |
+| Key | Action |
 |---|---|
-| gõ chữ | Tìm kiếm |
-| `←` `→` | Chọn thẻ |
-| `Enter` / click | Dán |
-| `⇧Enter` | Dán dạng text thuần |
-| `⌘1`…`⌘9` | Dán nhanh thẻ thứ 1–9 |
-| `Space` | Xem trước cỡ lớn (khi ô tìm trống) |
-| `Tab` / `⇧Tab` | Đổi tab lọc |
-| `⌘P` | Ghim vào Pinboard |
-| `⌘⌫` | Xoá thẻ |
-| `Esc` | Đóng xem trước → xoá ô tìm → đóng panel |
+| type | Search |
+| `←` `→` | Select a card |
+| `Enter` / click | Paste |
+| `⇧Enter` | Paste as plain text |
+| `⌘1`…`⌘9` | Quick-paste card 1–9 |
+| `Space` | Large preview (when the search field is empty) |
+| `Tab` / `⇧Tab` | Switch filter tab |
+| `⌘P` | Pin to a Pinboard |
+| `⌘⌫` | Delete card |
+| `Esc` | Close preview → clear search → close panel |
 
-Đổi phím tắt mở panel, giới hạn lịch sử, chạy khi đăng nhập… ở menu bar › **Cài đặt…** (⌘,).
+Change the panel hotkey, history limit, launch at login and more from the menu bar › **Settings…** (⌘,).
 
-## Dữ liệu
+## Data
 
-`~/Library/Application Support/9clipboard/` (quyền 0700): `clips.sqlite`, ảnh gốc trong `blobs/`, thumbnail trong `thumbs/`. Xoá thư mục này là xoá sạch lịch sử.
+`~/Library/Application Support/9clipboard/` (mode 0700): `clips.sqlite`, original images in `blobs/`, thumbnails in `thumbs/`. Deleting this folder wipes all history.
 
-Nếu sửa DB bằng `sqlite3`, luôn chạy `pragma foreign_keys=on;` trước, nếu không sẽ sót dòng mồ côi và app không khởi động được.
+If you edit the database with `sqlite3`, always run `pragma foreign_keys=on;` first; otherwise orphaned rows are left behind and the app will fail to start.
+
+## License
+
+[MIT](LICENSE)

@@ -3,7 +3,7 @@ import Foundation
 import Observation
 import os
 
-let log = Logger(subsystem: "com.9clipboard.app", category: "app")
+let log = Logger(subsystem: "io.github.lamht09.9clipboard", category: "app")
 
 /// Trạng thái dùng chung giữa menu bar, panel và các service.
 @MainActor

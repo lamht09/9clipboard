@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleIdentifier</key>
-	<string>com.9clipboard.app</string>
+	<string>io.github.lamht09.9clipboard</string>
 	<key>CFBundleName</key>
 	<string>9clipboard</string>
 	<key>CFBundleDisplayName</key>

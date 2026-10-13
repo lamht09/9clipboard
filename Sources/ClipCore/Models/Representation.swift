@@ -33,7 +33,7 @@ public enum UTI {
     public static let png = "public.png"
     public static let tiff = "public.tiff"
     /// Đánh dấu nội dung do chính 9clipboard ghi lên pasteboard, để monitor bỏ qua.
-    public static let selfMarker = "com.9clipboard.self"
+    public static let selfMarker = "io.github.lamht09.9clipboard.self"
 
     public static func isImage(_ uti: String) -> Bool { uti == png || uti == tiff }
 }
