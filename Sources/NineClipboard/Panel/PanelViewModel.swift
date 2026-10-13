@@ -8,6 +8,8 @@ import Observation
 final class PanelViewModel {
     private let model: AppModel
     var selectedIndex = 0
+    /// Chỉ đổi khi điều hướng bằng phím, để rê chuột chọn thẻ không làm dải thẻ cuộn theo.
+    var scrollTarget: Int64?
     /// Tăng mỗi lần mở panel để view cuộn về đầu.
     var openToken = 0
 
@@ -32,6 +34,7 @@ final class PanelViewModel {
     func move(by delta: Int) {
         guard !items.isEmpty else { return }
         selectedIndex = min(max(selectedIndex + delta, 0), items.count - 1)
+        scrollTarget = selectedItem?.id
     }
 
     func select(_ item: ClipItem) {

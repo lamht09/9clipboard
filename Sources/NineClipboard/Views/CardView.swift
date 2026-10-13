@@ -3,7 +3,7 @@ import ClipCore
 import SwiftUI
 
 struct CardView: View {
-    static let size: CGFloat = 220
+    static let size: CGFloat = 150
 
     let item: ClipItem
     let index: Int
@@ -14,15 +14,16 @@ struct CardView: View {
             header
             content
                 .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .topLeading)
-                .padding(10)
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
             footer
         }
         .frame(width: Self.size, height: Self.size)
-        .background(Color(nsColor: .textBackgroundColor).opacity(0.85))
-        .clipShape(RoundedRectangle(cornerRadius: 12))
+        .background(Color(nsColor: .textBackgroundColor).opacity(isSelected ? 0.95 : 0.7))
+        .clipShape(RoundedRectangle(cornerRadius: 10))
         .overlay {
-            RoundedRectangle(cornerRadius: 12)
-                .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.08), lineWidth: isSelected ? 2 : 1)
+            RoundedRectangle(cornerRadius: 10)
+                .strokeBorder(isSelected ? Color.accentColor : Color.primary.opacity(0.06), lineWidth: isSelected ? 2 : 1)
         }
         .scaleEffect(isSelected ? 1.03 : 1)
         .animation(.easeOut(duration: 0.1), value: isSelected)
@@ -30,26 +31,23 @@ struct CardView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 5) {
+            Circle()
+                .fill(item.kind.color)
+                .frame(width: 6, height: 6)
             Text(item.kind.label)
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 10, weight: .semibold))
             Spacer(minLength: 4)
-            if let name = item.sourceAppName {
-                Text(name)
-                    .font(.system(size: 11))
-                    .lineLimit(1)
-                    .opacity(0.85)
-            }
             if let icon = AppIconCache.icon(for: item.sourceBundleID) {
                 Image(nsImage: icon)
                     .resizable()
-                    .frame(width: 16, height: 16)
+                    .frame(width: 14, height: 14)
+                    .help(item.sourceAppName ?? "")
             }
         }
-        .foregroundStyle(.white)
-        .padding(.horizontal, 10)
-        .frame(height: 30)
-        .background(item.kind.color)
+        .foregroundStyle(.secondary)
+        .padding(.horizontal, 8)
+        .frame(height: 24)
     }
 
     @ViewBuilder
@@ -57,9 +55,9 @@ struct CardView: View {
         let text = (item.plainText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         Text(String(text.prefix(600)))
             .font(CodeApps.isCodeApp(item.sourceBundleID)
-                  ? .system(size: 11.5, design: .monospaced)
-                  : .system(size: 12.5))
-            .lineLimit(8)
+                  ? .system(size: 10.5, design: .monospaced)
+                  : .system(size: 11.5))
+            .lineLimit(6)
             .foregroundStyle(item.kind == .link ? Color.accentColor : .primary)
     }
 
@@ -74,10 +72,10 @@ struct CardView: View {
                 Text("⌘\(index + 1)")
             }
         }
-        .font(.system(size: 10.5))
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 10)
-        .padding(.bottom, 8)
+        .font(.system(size: 9.5))
+        .foregroundStyle(.tertiary)
+        .padding(.horizontal, 8)
+        .padding(.bottom, 6)
     }
 }
 

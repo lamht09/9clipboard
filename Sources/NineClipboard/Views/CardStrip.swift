@@ -7,16 +7,17 @@ struct CardStrip: View {
     var body: some View {
         ScrollViewReader { proxy in
             ScrollView(.horizontal, showsIndicators: false) {
-                LazyHStack(spacing: 12) {
+                LazyHStack(spacing: 10) {
                     ForEach(Array(viewModel.items.enumerated()), id: \.element.id) { index, item in
                         CardView(item: item, index: index, isSelected: index == viewModel.selectedIndex)
                             .id(item.id)
-                            .onTapGesture(count: 2) { viewModel.pick(item) }
-                            .onTapGesture { viewModel.select(item) }
+                            // Click một lần là dán luôn; rê chuột qua thì chọn.
+                            .onTapGesture { viewModel.pick(item) }
+                            .onHover { inside in if inside { viewModel.select(item) } }
                     }
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
+                .padding(.horizontal, 14)
+                .padding(.vertical, 6)
             }
             .overlay {
                 if viewModel.items.isEmpty {
@@ -24,10 +25,10 @@ struct CardStrip: View {
                         .foregroundStyle(.secondary)
                 }
             }
-            .onChange(of: viewModel.selectedIndex) { _, index in
-                guard viewModel.items.indices.contains(index) else { return }
+            .onChange(of: viewModel.scrollTarget) { _, id in
+                guard let id else { return }
                 withAnimation(.easeOut(duration: 0.12)) {
-                    proxy.scrollTo(viewModel.items[index].id, anchor: .center)
+                    proxy.scrollTo(id, anchor: .center)
                 }
             }
             .onChange(of: viewModel.openToken) { _, _ in

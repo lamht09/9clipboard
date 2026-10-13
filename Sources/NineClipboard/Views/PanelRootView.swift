@@ -8,7 +8,7 @@ struct PanelRootView: View {
         VStack(alignment: .leading, spacing: 10) {
             CardStrip(viewModel: viewModel)
         }
-        .padding(.vertical, 16)
+        .padding(.vertical, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }

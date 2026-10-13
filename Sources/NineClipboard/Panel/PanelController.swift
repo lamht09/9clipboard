@@ -5,7 +5,8 @@ import SwiftUI
 
 @MainActor
 final class PanelController: NSObject, NSWindowDelegate {
-    static let height: CGFloat = 300
+    static let height: CGFloat = 190
+    static let maxWidth: CGFloat = 1100
     static let margin: CGFloat = 12
 
     private let panel = ClipPanel()
@@ -73,10 +74,11 @@ final class PanelController: NSObject, NSWindowDelegate {
 
         let screen = NSScreen.screens.first { NSMouseInRect(NSEvent.mouseLocation, $0.frame, false) } ?? NSScreen.main
         guard let visible = screen?.visibleFrame else { return }
+        let width = min(visible.width - Self.margin * 2, Self.maxWidth)
         let target = NSRect(
-            x: visible.minX + Self.margin,
+            x: visible.midX - width / 2,
             y: visible.minY + Self.margin,
-            width: visible.width - Self.margin * 2,
+            width: width,
             height: Self.height
         )
         var start = target
