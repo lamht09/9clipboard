@@ -38,6 +38,27 @@ final class PanelController: NSObject, NSWindowDelegate {
         panel.contentView = effect
         panel.delegate = self
         panel.keyHandler = { [weak self] event in self?.handleKey(event) ?? false }
+        viewModel.onPick = { [weak self] item, plainOnly in self?.paste(item, plainOnly: plainOnly) }
+    }
+
+    /// Ghi item lên pasteboard, đóng panel rồi gửi ⌘V (DESIGN §5.2).
+    private func paste(_ item: ClipItem, plainOnly: Bool) {
+        guard let id = item.id else { return }
+        Task {
+            let reps = (try? await model.store.representations(itemID: id)) ?? []
+            PasteService.write(item, representations: reps, plainOnly: plainOnly)
+            // Đóng ngay (không animation) để panel nhả bàn phím trước khi ⌘V được gửi.
+            hide(animated: false)
+            if Preferences.autoPaste {
+                if PermissionService.isTrusted {
+                    PasteService.sendPasteKeystroke()
+                } else {
+                    PermissionService.noteMissingPermissionOnce()
+                }
+            }
+            try? await model.store.markUsed(id: id)
+            await model.reload()
+        }
     }
 
     func toggle() {
@@ -72,9 +93,13 @@ final class PanelController: NSObject, NSWindowDelegate {
         }
     }
 
-    func hide() {
+    func hide(animated: Bool = true) {
         guard isShown else { return }
         isShown = false
+        guard animated else {
+            panel.orderOut(nil)
+            return
+        }
         var end = panel.frame
         end.origin.y -= Self.height / 2
         NSAnimationContext.runAnimationGroup({ ctx in

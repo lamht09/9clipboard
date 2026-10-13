@@ -36,5 +36,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.monitor = monitor
 
         Task { await model.reload() }
+        PermissionService.showOnboardingIfNeeded()
     }
 }
