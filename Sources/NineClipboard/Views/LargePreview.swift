@@ -41,7 +41,7 @@ struct LargePreviewView: View {
             Text(item.sourceAppName ?? "")
             Spacer()
             Text(Self.detail(for: item))
-            Text("Space để đóng").foregroundStyle(.tertiary)
+            Text("Space to close").foregroundStyle(.tertiary)
         }
         .font(.system(size: 11))
         .foregroundStyle(.secondary)
@@ -70,7 +70,7 @@ struct LargePreviewView: View {
         if let w = item.imageWidth, let h = item.imageHeight {
             parts.append("\(w)×\(h)")
         } else if let text = item.plainText {
-            parts.append("\(text.count) ký tự")
+            parts.append(String(localized: "\(text.count) characters"))
         }
         parts.append(ByteCountFormatter.string(fromByteCount: Int64(item.byteSize), countStyle: .file))
         return parts.joined(separator: " · ")

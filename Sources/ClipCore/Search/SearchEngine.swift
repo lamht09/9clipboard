@@ -8,17 +8,6 @@ public enum ClipFilter: Hashable, Sendable {
     /// Các tab theo loại, đứng trước các tab Pinboard.
     public static let kinds: [ClipFilter] = [.all, .text, .link, .image]
 
-    /// Tên tab theo loại; tab Pinboard lấy tên bảng.
-    public var label: String {
-        switch self {
-        case .all: "Tất cả"
-        case .text: "Text"
-        case .link: "Link"
-        case .image: "Ảnh"
-        case .pinboard: "Pinboard"
-        }
-    }
-
     public func includes(_ item: ClipItem) -> Bool {
         switch self {
         case .all: true

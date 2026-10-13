@@ -21,13 +21,13 @@ enum PermissionService {
         guard !isTrusted, !defaults.bool(forKey: onboardingShownKey) else { return }
         defaults.set(true, forKey: onboardingShownKey)
         presentPermissionAlert(
-            title: "Chào mừng đến với 9clipboard",
-            message: """
-            Bấm \(Preferences.hotkey.displayString) để mở lịch sử clipboard.
+            title: String(localized: "Welcome to 9clipboard"),
+            message: String(localized: """
+            Press \(Preferences.hotkey.displayString) to open your clipboard history.
 
-            Để tự dán vào app đang dùng, 9clipboard cần quyền Trợ năng (Accessibility) để gửi phím ⌘V. \
-            Nếu không cấp, bạn vẫn dùng được: chọn một mục rồi tự bấm ⌘V.
-            """
+            To paste into the active app, 9clipboard needs Accessibility access to send ⌘V. \
+            Without it you can still pick an item, then press ⌘V yourself.
+            """)
         )
     }
 
@@ -37,8 +37,8 @@ enum PermissionService {
         guard !defaults.bool(forKey: missingNoticeShownKey) else { return }
         defaults.set(true, forKey: missingNoticeShownKey)
         presentPermissionAlert(
-            title: "Đã copy — bấm ⌘V để dán",
-            message: "9clipboard chưa có quyền Trợ năng nên không tự dán được. Cấp quyền để lần sau tự dán."
+            title: String(localized: "Copied — press ⌘V to paste"),
+            message: String(localized: "9clipboard can’t paste for you without Accessibility access. Grant it to paste automatically next time.")
         )
     }
 
@@ -46,8 +46,8 @@ enum PermissionService {
         let alert = NSAlert()
         alert.messageText = title
         alert.informativeText = message
-        alert.addButton(withTitle: "Mở System Settings")
-        alert.addButton(withTitle: "Để sau")
+        alert.addButton(withTitle: String(localized: "Open System Settings"))
+        alert.addButton(withTitle: String(localized: "Later"))
         NSApp.bringToFront()
         if alert.runModal() == .alertFirstButtonReturn {
             openSettings()

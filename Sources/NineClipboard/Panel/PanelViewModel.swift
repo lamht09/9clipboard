@@ -81,10 +81,10 @@ final class PanelViewModel {
     }
 
     var emptyMessage: String {
-        if !activeQuery.isEmpty { return "Không tìm thấy “\(activeQuery)”" }
-        if model.items.isEmpty { return "Chưa có gì trong lịch sử. Hãy copy thứ gì đó." }
-        if case .pinboard = filter { return "Bảng này chưa có mục nào. Chọn thẻ rồi bấm ⌘P để ghim." }
-        return "Không có mục nào ở tab \(filter.label)"
+        if !activeQuery.isEmpty { return String(localized: "No results for “\(activeQuery)”") }
+        if model.items.isEmpty { return String(localized: "Nothing in your history yet. Copy something.") }
+        if case .pinboard = filter { return String(localized: "This board is empty. Select a card and press ⌘P to pin it.") }
+        return String(localized: "Nothing in the \(filter.label) tab")
     }
     var previews: PreviewCache { model.previews }
     var pinboards: [Pinboard] { model.pinboards }
@@ -192,7 +192,7 @@ final class PanelViewModel {
         switch editor.mode {
         case .create(let item):
             let finalName = !name.isEmpty ? name
-                : pinboards.isEmpty ? ClipboardStore.defaultPinboardName : "Bảng \(pinboards.count + 1)"
+                : pinboards.isEmpty ? Pinboard.defaultName : String(localized: "Board \(pinboards.count + 1)")
             Task { await model.createPinboard(name: finalName, pinning: item) }
         case .rename(var board):
             guard !name.isEmpty, name != board.name else { return }

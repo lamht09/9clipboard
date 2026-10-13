@@ -37,8 +37,8 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
             openSettings: { settingsController.show() },
             clearHistory: {
                 guard SettingsModel.confirm(
-                    "Xoá toàn bộ lịch sử?", info: "Các mục đã ghim vẫn được giữ lại. Không hoàn tác được.",
-                    button: "Xoá") else { return }
+                    String(localized: "Clear all history?"), info: SettingsModel.clearHistoryInfo,
+                    button: String(localized: "Delete")) else { return }
                 Task { await model.clearHistory() }
             })
         self.statusItemController = statusItemController

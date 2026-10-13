@@ -3,7 +3,12 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>vi</string>
+	<string>en</string>
+	<key>CFBundleLocalizations</key>
+	<array>
+		<string>en</string>
+		<string>vi</string>
+	</array>
 	<key>CFBundleIdentifier</key>
 	<string>io.github.lamht09.9clipboard</string>
 	<key>CFBundleName</key>
@@ -23,7 +28,7 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>NSHumanReadableCopyright</key>
-	<string>© 2026 Lâm Hoàng. Phát hành theo giấy phép MIT.</string>
+	<string>© 2026 Lâm Hoàng. Released under the MIT License.</string>
 	<key>LSMinimumSystemVersion</key>
 	<string>14.0</string>
 	<key>LSUIElement</key>

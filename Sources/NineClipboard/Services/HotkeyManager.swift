@@ -164,16 +164,16 @@ extension HotkeyManager.Shortcut {
     var knownConflict: String? {
         let cmd = UInt32(cmdKey), shift = UInt32(shiftKey), ctrl = UInt32(controlKey)
         let table: [(Int, UInt32, String)] = [
-            (kVK_ANSI_C, cmd, "Copy"), (kVK_ANSI_V, cmd, "Dán"), (kVK_ANSI_X, cmd, "Cắt"),
-            (kVK_ANSI_Z, cmd, "Hoàn tác"), (kVK_ANSI_A, cmd, "Chọn tất cả"), (kVK_ANSI_S, cmd, "Lưu"),
-            (kVK_ANSI_Q, cmd, "Thoát app"), (kVK_ANSI_W, cmd, "Đóng cửa sổ"), (kVK_ANSI_T, cmd, "Tab mới"),
-            (kVK_ANSI_N, cmd, "Cửa sổ mới"), (kVK_ANSI_F, cmd, "Tìm"), (kVK_ANSI_P, cmd, "In"),
-            (kVK_ANSI_H, cmd, "Ẩn app"), (kVK_ANSI_M, cmd, "Thu nhỏ"), (kVK_Tab, cmd, "Chuyển app"),
-            (kVK_Space, cmd, "Spotlight"), (kVK_Space, ctrl, "Đổi bộ gõ"),
-            (kVK_ANSI_V, cmd | shift, "Dán không định dạng (Slack, Google Docs, Notion…)"),
-            (kVK_ANSI_3, cmd | shift, "Chụp màn hình"), (kVK_ANSI_4, cmd | shift, "Chụp màn hình"),
-            (kVK_ANSI_5, cmd | shift, "Chụp màn hình"),
+            (kVK_ANSI_C, cmd, "Copy"), (kVK_ANSI_V, cmd, "Paste"), (kVK_ANSI_X, cmd, "Cut"),
+            (kVK_ANSI_Z, cmd, "Undo"), (kVK_ANSI_A, cmd, "Select All"), (kVK_ANSI_S, cmd, "Save"),
+            (kVK_ANSI_Q, cmd, "Quit App"), (kVK_ANSI_W, cmd, "Close Window"), (kVK_ANSI_T, cmd, "New Tab"),
+            (kVK_ANSI_N, cmd, "New Window"), (kVK_ANSI_F, cmd, "Find"), (kVK_ANSI_P, cmd, "Print"),
+            (kVK_ANSI_H, cmd, "Hide App"), (kVK_ANSI_M, cmd, "Minimize"), (kVK_Tab, cmd, "Switch Apps"),
+            (kVK_Space, cmd, "Spotlight"), (kVK_Space, ctrl, "Switch Input Source"),
+            (kVK_ANSI_V, cmd | shift, "Paste and Match Style (Slack, Google Docs, Notion…)"),
+            (kVK_ANSI_3, cmd | shift, "Screenshot"), (kVK_ANSI_4, cmd | shift, "Screenshot"),
+            (kVK_ANSI_5, cmd | shift, "Screenshot"),
         ]
-        return table.first { $0.0 == Int(keyCode) && $0.1 == modifiers }?.2
+        return table.first { $0.0 == Int(keyCode) && $0.1 == modifiers }.map { NSLocalizedString($0.2, comment: "") }
     }
 }

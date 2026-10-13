@@ -45,6 +45,31 @@ final class SettingsModel {
     }
     private(set) var diskUsage = 0
 
+    // MARK: Ngôn ngữ
+
+    var language = AppLanguage.current {
+        didSet {
+            guard language != oldValue else { return }
+            AppLanguage.save(language)
+            // Chọn "Theo hệ thống" mà vẫn ra đúng bản dịch đang chạy thì không cần khởi động lại.
+            guard language.resolvedLocalization != AppLanguage.running else { return }
+            // Hỏi sau khi Picker đóng hẳn, không chạy modal ngay trong lúc SwiftUI ghi binding.
+            Task { Self.askToRelaunch() }
+        }
+    }
+
+    private static func askToRelaunch() {
+        let alert = NSAlert()
+        alert.messageText = String(localized: "Restart 9clipboard to change the language?")
+        alert.informativeText = String(localized: "Your clipboard history and settings are kept.")
+        alert.addButton(withTitle: String(localized: "Restart Now"))
+        alert.addButton(withTitle: String(localized: "Later"))
+        NSApp.bringToFront()
+        if alert.runModal() == .alertFirstButtonReturn {
+            AppLanguage.relaunch()
+        }
+    }
+
     // MARK: Phím tắt
 
     private(set) var shortcut = Preferences.hotkey
@@ -64,21 +89,21 @@ final class SettingsModel {
     @discardableResult
     func record(_ new: HotkeyManager.Shortcut) -> Bool {
         guard new.isUsable else {
-            shortcutMessage = "Cần ít nhất một phím ⌘, ⌥ hoặc ⌃."
+            shortcutMessage = String(localized: "Use at least one of ⌘, ⌥ or ⌃.")
             return false
         }
         let old = shortcut
         guard HotkeyManager.shared.register(new) else {
             HotkeyManager.shared.register(old)
             HotkeyManager.shared.suspend()
-            shortcutMessage = "\(new.displayString) đang được hệ thống hoặc app khác dùng. Hãy chọn tổ hợp khác."
+            shortcutMessage = String(localized: "\(new.displayString) is already used by the system or another app. Choose a different shortcut.")
             return false
         }
         // Đang ghi phím thì giữ tạm tắt, `endRecording` sẽ bật lại.
         HotkeyManager.shared.suspend()
         shortcut = new
         Preferences.hotkey = new
-        shortcutMessage = new.knownConflict.map { "Lưu ý: \(new.displayString) thường dùng cho “\($0)”, app đó sẽ không nhận được phím này nữa." }
+        shortcutMessage = new.knownConflict.map { String(localized: "Note: \(new.displayString) is usually “\($0)”; that app will no longer receive it.") }
         return true
     }
 
@@ -89,7 +114,7 @@ final class SettingsModel {
             Preferences.hotkey = .default
         } else {
             HotkeyManager.shared.register(shortcut)
-            shortcutMessage = "Không đăng ký được \(HotkeyManager.Shortcut.default.displayString)."
+            shortcutMessage = String(localized: "Couldn’t register \(HotkeyManager.Shortcut.default.displayString).")
         }
     }
 
@@ -157,7 +182,7 @@ final class SettingsModel {
         panel.directoryURL = URL(fileURLWithPath: "/Applications")
         panel.allowedContentTypes = [.application]
         panel.allowsMultipleSelection = true
-        panel.prompt = "Loại trừ"
+        panel.prompt = String(localized: "Exclude")
         guard panel.runModal() == .OK else { return }
         var ids = Preferences.excludedBundleIDs
         for url in panel.urls {
@@ -178,13 +203,18 @@ final class SettingsModel {
 
     /// `nil`: xoá toàn bộ lịch sử. Hỏi lại trước khi xoá; mục đã ghim luôn được giữ.
     func clearHistory(fromApp source: ClipboardStore.SourceApp? = nil) {
-        let title = source.map { "Xoá \($0.count) mục copy từ \($0.name)?" } ?? "Xoá toàn bộ lịch sử?"
-        guard Self.confirm(title, info: "Các mục đã ghim vẫn được giữ lại. Không hoàn tác được.", button: "Xoá")
+        let title = source.map { String(localized: "Delete \($0.count) items copied from \($0.name)?") }
+            ?? String(localized: "Clear all history?")
+        guard Self.confirm(title, info: Self.clearHistoryInfo, button: String(localized: "Delete"))
         else { return }
         Task {
             await app.clearHistory(fromApp: source?.bundleID)
             refresh()
         }
+    }
+
+    static var clearHistoryInfo: String {
+        String(localized: "Pinned items are kept. This can’t be undone.")
     }
 
     /// Hộp thoại xác nhận có nút nguy hiểm. Kích hoạt app trước để hộp thoại không bị che.
@@ -194,7 +224,7 @@ final class SettingsModel {
         alert.informativeText = info
         alert.alertStyle = .warning
         alert.addButton(withTitle: button).hasDestructiveAction = true
-        alert.addButton(withTitle: "Huỷ")
+        alert.addButton(withTitle: String(localized: "Cancel"))
         NSApp.bringToFront()
         return alert.runModal() == .alertFirstButtonReturn
     }
@@ -225,9 +255,9 @@ final class SettingsModel {
 
     func delete(_ board: Pinboard) {
         guard Self.confirm(
-            "Xoá bảng “\(board.name)”?",
-            info: "Các mục trong bảng được bỏ ghim và đưa lên đầu lịch sử, không bị xoá.",
-            button: "Xoá bảng")
+            String(localized: "Delete board “\(board.name)”?"),
+            info: String(localized: "Its items are unpinned and moved to the top of your history, not deleted."),
+            button: String(localized: "Delete Board"))
         else { return }
         Task { await app.deletePinboard(board) }
     }
@@ -239,7 +269,7 @@ final class SettingsModel {
     }
 
     func createPinboard() {
-        Task { await app.createPinboard(name: "Bảng mới") }
+        Task { await app.createPinboard(name: String(localized: "New Board")) }
     }
 
     // MARK: - Quyền

@@ -33,7 +33,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         let symbol = paused ? "pause.circle" : "list.clipboard"
         statusItem.button?.image = NSImage(
             systemSymbolName: symbol,
-            accessibilityDescription: paused ? "9clipboard (đang tạm dừng)" : "9clipboard")
+            accessibilityDescription: paused ? String(localized: "9clipboard (paused)") : "9clipboard")
         statusItem.button?.appearsDisabled = privacy.skipNext && !paused
     }
 
@@ -42,7 +42,9 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         menu.removeAllItems()
 
         let shortcut = HotkeyManager.shared.shortcut
-        let open = ClosureMenuItem(title: "Mở 9clipboard", key: shortcut?.menuKeyEquivalent ?? "") { [openPanel] in
+        let open = ClosureMenuItem(
+            title: String(localized: "Open 9clipboard"), key: shortcut?.menuKeyEquivalent ?? ""
+        ) { [openPanel] in
             // Đợi menu đóng hẳn rồi mới mở panel, nếu không panel sẽ mất key ngay.
             DispatchQueue.main.async { openPanel() }
         }
@@ -54,39 +56,38 @@ final class StatusItemController: NSObject, NSMenuDelegate {
             let status = NSMenuItem(title: Self.pauseStatus(until: until), action: nil, keyEquivalent: "")
             status.isEnabled = false
             menu.addItem(status)
-            menu.addItem(ClosureMenuItem(title: "Tiếp tục ghi") { [privacy] in privacy.resume() })
+            menu.addItem(ClosureMenuItem(title: String(localized: "Resume Recording")) { [privacy] in privacy.resume() })
         } else {
-            let pause = NSMenuItem(title: "Tạm dừng ghi", action: nil, keyEquivalent: "")
+            let pause = NSMenuItem(title: String(localized: "Pause Recording"), action: nil, keyEquivalent: "")
             let sub = NSMenu()
-            sub.addItem(ClosureMenuItem(title: "15 phút") { [privacy] in privacy.pause(for: 15 * 60) })
-            sub.addItem(ClosureMenuItem(title: "1 giờ") { [privacy] in privacy.pause(for: 60 * 60) })
-            sub.addItem(ClosureMenuItem(title: "Đến khi bật lại") { [privacy] in privacy.pause(for: nil) })
+            sub.addItem(ClosureMenuItem(title: String(localized: "15 Minutes")) { [privacy] in privacy.pause(for: 15 * 60) })
+            sub.addItem(ClosureMenuItem(title: String(localized: "1 Hour")) { [privacy] in privacy.pause(for: 60 * 60) })
+            sub.addItem(ClosureMenuItem(title: String(localized: "Until Resumed")) { [privacy] in privacy.pause(for: nil) })
             pause.submenu = sub
             menu.addItem(pause)
 
-            let skip = ClosureMenuItem(title: "Bỏ qua lần copy tiếp theo") { [privacy] in privacy.toggleSkipNext() }
+            let skip = ClosureMenuItem(title: String(localized: "Skip Next Copy")) { [privacy] in privacy.toggleSkipNext() }
             skip.state = privacy.skipNext ? .on : .off
             menu.addItem(skip)
         }
 
         menu.addItem(.separator())
         // Hộp thoại/cửa sổ mở sau khi menu đóng hẳn.
-        menu.addItem(ClosureMenuItem(title: "Xoá lịch sử…") { [clearHistory] in
+        menu.addItem(ClosureMenuItem(title: String(localized: "Clear History…")) { [clearHistory] in
             DispatchQueue.main.async { clearHistory() }
         })
-        let settings = ClosureMenuItem(title: "Cài đặt…", key: ",") { [openSettings] in
+        let settings = ClosureMenuItem(title: String(localized: "Settings…"), key: ",") { [openSettings] in
             DispatchQueue.main.async { openSettings() }
         }
         settings.keyEquivalentModifierMask = [.command]
         menu.addItem(settings)
-        menu.addItem(NSMenuItem(title: "Thoát", action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
+        menu.addItem(NSMenuItem(
+            title: String(localized: "Quit"), action: #selector(NSApplication.terminate(_:)), keyEquivalent: "q"))
     }
 
     private static func pauseStatus(until: Date) -> String {
-        guard until != .distantFuture else { return "Đang tạm dừng" }
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "vi_VN")
-        formatter.dateFormat = "HH:mm"
-        return "Đang tạm dừng đến \(formatter.string(from: until))"
+        guard until != .distantFuture else { return String(localized: "Paused") }
+        let time = until.formatted(date: .omitted, time: .shortened)
+        return String(localized: "Paused until \(time)")
     }
 }

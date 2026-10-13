@@ -7,6 +7,7 @@ Trình quản lý lịch sử clipboard cho macOS (Apple Silicon). Bấm **⌥V*
 - Lưu text, rich text và ảnh; tìm fuzzy không dấu tiếng Việt (`da nang` → “Đà Nẵng”)
 - Ghim vào các Pinboard, mục đã ghim không bị xoá
 - Mật khẩu (từ 1Password, Passwords…) tự xoá sau 15 phút; loại trừ app, tạm dừng ghi
+- Giao diện tiếng Anh và tiếng Việt (theo ngôn ngữ của máy, đổi trong Cài đặt › Chung)
 - Dữ liệu chỉ nằm trên máy, không có network
 
 Thiết kế: [docs/DESIGN.md](docs/DESIGN.md) · Kế hoạch: [docs/PLAN.md](docs/PLAN.md) · Tiến độ: [docs/STATE.md](docs/STATE.md)

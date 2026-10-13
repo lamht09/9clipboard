@@ -105,7 +105,8 @@ final class AppModel {
 
     func pinToDefault(_ item: ClipItem) async {
         guard let id = item.id else { return }
-        await perform("pinToDefault") { try await $0.pinToDefault(itemID: id) }
+        let name = Pinboard.defaultName
+        await perform("pinToDefault") { try await $0.pinToDefault(itemID: id, boardName: name) }
     }
 
     func unpin(_ item: ClipItem) async {

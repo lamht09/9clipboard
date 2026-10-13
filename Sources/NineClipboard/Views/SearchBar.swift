@@ -11,7 +11,7 @@ struct SearchBar: View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
-            TextField("Tìm kiếm…", text: $viewModel.query)
+            TextField("Search…", text: $viewModel.query)
                 .textFieldStyle(.plain)
                 .focused($focused)
             if !viewModel.query.isEmpty {
@@ -65,7 +65,7 @@ struct FilterTabs: View {
                     .shadow(color: .black.opacity(0.2), radius: 4, y: 1)
                     .contentShape(Circle())
                     .onTapGesture { viewModel.startCreatingBoard() }
-                    .help("Tạo Pinboard mới")
+                    .help("New Pinboard")
             }
         }
     }
@@ -106,8 +106,8 @@ struct FilterTabs: View {
         .onTapGesture { viewModel.filter = filter }
         .contextMenu {
             if let board {
-                Button("Đổi tên…") { viewModel.startRenaming(board) }
-                Menu("Màu") {
+                Button("Rename…") { viewModel.startRenaming(board) }
+                Menu("Color") {
                     ForEach(ClipboardStore.pinboardPalette, id: \.self) { hex in
                         Button {
                             viewModel.setColor(hex, for: board)
@@ -117,7 +117,7 @@ struct FilterTabs: View {
                     }
                 }
                 Divider()
-                Button("Xoá bảng (các mục vẫn còn trong lịch sử)") { viewModel.deleteBoard(board) }
+                Button("Delete Board (items stay in history)") { viewModel.deleteBoard(board) }
             }
         }
     }
@@ -132,7 +132,7 @@ private struct BoardNameField: View {
     var body: some View {
         HStack(spacing: 5) {
             Circle().fill(color).frame(width: 6, height: 6)
-            TextField("Tên bảng", text: Binding(
+            TextField("Board Name", text: Binding(
                 get: { viewModel.boardEditor?.name ?? "" },
                 set: { viewModel.boardEditor?.name = $0 }))
                 .textFieldStyle(.plain)
@@ -150,16 +150,34 @@ private struct BoardNameField: View {
 enum ColorName {
     static func name(for hex: String) -> String {
         switch hex {
-        case "#4F8EF7": "Xanh dương"
-        case "#F25C54": "Đỏ"
-        case "#F7B32B": "Vàng"
-        case "#2BB673": "Xanh lá"
-        case "#9B5DE5": "Tím"
-        case "#00B8D9": "Xanh ngọc"
-        case "#FF7AB6": "Hồng"
-        default: "Xám"
+        case "#4F8EF7": String(localized: "Blue")
+        case "#F25C54": String(localized: "Red")
+        case "#F7B32B": String(localized: "Yellow")
+        case "#2BB673": String(localized: "Green")
+        case "#9B5DE5": String(localized: "Purple")
+        case "#00B8D9": String(localized: "Teal")
+        case "#FF7AB6": String(localized: "Pink")
+        default: String(localized: "Gray")
         }
     }
+}
+
+extension ClipFilter {
+    /// Tên tab theo loại; tab Pinboard lấy tên bảng.
+    var label: String {
+        switch self {
+        case .all: String(localized: "All")
+        case .text: String(localized: "Text")
+        case .link: String(localized: "Link")
+        case .image: String(localized: "Image")
+        case .pinboard: String(localized: "Pinboard")
+        }
+    }
+}
+
+extension Pinboard {
+    /// Bảng nhận mục khi ghim nhanh (⌘P). Tên theo ngôn ngữ giao diện lúc tạo bảng.
+    static var defaultName: String { String(localized: "Pinned") }
 }
 
 extension Color {

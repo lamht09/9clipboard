@@ -67,7 +67,7 @@ struct CardView: View {
                 Image(systemName: "lock.fill")
                     .font(.system(size: 9))
                     .foregroundStyle(Color.orange)
-                    .help("Mật khẩu: tự xoá nếu không giữ lại")
+                    .help("Password: deleted unless you keep it")
             }
             if let pinboard {
                 Image(systemName: "pin.fill")
@@ -132,7 +132,7 @@ struct CardView: View {
             if let expiresAt = item.expiresAt {
                 // Đếm ngược tới lúc tự xoá; tự cập nhật mỗi 15s khi panel đang mở.
                 TimelineView(.periodic(from: .now, by: 15)) { context in
-                    Text("xoá \(ExpiryText.string(until: expiresAt, now: context.date))")
+                    Text("deleted \(ExpiryText.string(until: expiresAt, now: context.date))")
                         .foregroundStyle(Color.orange)
                 }
             } else {
@@ -174,10 +174,10 @@ struct VisualEffectBackground: NSViewRepresentable {
 extension ClipKind {
     var label: String {
         switch self {
-        case .text: "Text"
-        case .rich: "Rich"
-        case .image: "Ảnh"
-        case .link: "Link"
+        case .text: String(localized: "Text")
+        case .rich: String(localized: "Rich")
+        case .image: String(localized: "Image")
+        case .link: String(localized: "Link")
         }
     }
 
@@ -219,23 +219,23 @@ enum CodeApps {
 }
 
 enum ExpiryText {
-    /// "sau 12 phút" / "sau 40 giây" / "ngay".
+    /// "in 12 min" / "in 40 sec" / "now" ("sau 12 phút" / "sau 40 giây" / "ngay").
     static func string(until date: Date, now: Date = Date()) -> String {
         let seconds = date.timeIntervalSince(now)
-        if seconds <= 0 { return "ngay" }
-        if seconds < 60 { return "sau \(Int(seconds)) giây" }
-        return "sau \(Int((seconds / 60).rounded(.up))) phút"
+        if seconds <= 0 { return String(localized: "now") }
+        if seconds < 60 { return String(localized: "in \(Int(seconds)) sec") }
+        return String(localized: "in \(Int((seconds / 60).rounded(.up))) min")
     }
 }
 
 enum RelativeTime {
     static func string(for date: Date, now: Date = Date()) -> String {
         let seconds = now.timeIntervalSince(date)
-        if seconds < 60 { return "vừa xong" }
-        if seconds < 3600 { return "\(Int(seconds / 60)) phút" }
-        if seconds < 86400 { return "\(Int(seconds / 3600)) giờ" }
-        if Calendar.current.isDateInYesterday(date) { return "hôm qua" }
-        if seconds < 7 * 86400 { return "\(Int(seconds / 86400)) ngày" }
+        if seconds < 60 { return String(localized: "just now") }
+        if seconds < 3600 { return String(localized: "\(Int(seconds / 60)) min") }
+        if seconds < 86400 { return String(localized: "\(Int(seconds / 3600)) hr") }
+        if Calendar.current.isDateInYesterday(date) { return String(localized: "yesterday") }
+        if seconds < 7 * 86400 { return String(localized: "\(Int(seconds / 86400)) days") }
         return date.formatted(.dateTime.day().month())
     }
 }

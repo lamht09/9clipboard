@@ -98,6 +98,6 @@ final class RecorderButton: NSButton {
     }
 
     private func updateTitle() {
-        title = isRecording ? "Bấm tổ hợp phím…" : (shortcut?.displayString ?? "Chưa đặt")
+        title = isRecording ? String(localized: "Press a shortcut…") : (shortcut?.displayString ?? String(localized: "Not Set"))
     }
 }

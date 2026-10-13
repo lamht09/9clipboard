@@ -91,7 +91,7 @@ import Testing
     @Test func pinningKeepsItem() async throws {
         let (store, _) = try makeStore()
         let item = try await store.insertOrBump(textCapture("hunter2"), historyLimit: 500, expiresAt: now.addingTimeInterval(900), now: now).item
-        try await store.pinToDefault(itemID: item.id!)
+        try await store.pinToDefault(itemID: item.id!, boardName: "Pinned")
         #expect(try await store.purgeExpired(now: now.addingTimeInterval(3600)) == 0)
         #expect(try await store.item(id: item.id!)?.isPinned == true)
     }

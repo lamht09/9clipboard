@@ -23,7 +23,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
 
     private func makeWindow() -> NSWindow {
         let window = NSWindow(contentViewController: NSHostingController(rootView: SettingsView(model: model)))
-        window.title = "Cài đặt 9clipboard"
+        window.title = String(localized: "9clipboard Settings")
         window.styleMask = [.titled, .closable]
         window.isReleasedWhenClosed = false
         window.delegate = self

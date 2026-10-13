@@ -7,6 +7,7 @@ A clipboard history manager for macOS (Apple Silicon). Press **⌥V** to open a 
 - Keeps text, rich text and images; fuzzy, accent-insensitive search (typing `da nang` finds “Đà Nẵng”)
 - Pin items to Pinboards; pinned items are never deleted
 - Passwords (from 1Password, Passwords…) are removed after 15 minutes; exclude apps, pause recording
+- English and Vietnamese interface (follows your Mac’s language; change it in Settings › General)
 - All data stays on your Mac — no network access
 
 Docs (in Vietnamese): [design](docs/DESIGN.md) · [plan](docs/PLAN.md) · [status](docs/STATE.md)

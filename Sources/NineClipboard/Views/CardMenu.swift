@@ -13,24 +13,24 @@ struct CardActionBar: View {
         HStack(spacing: 2) {
             if let expiresAt = item.expiresAt {
                 // Mật khẩu: bấm để giữ lại, không thì tự xoá khi hết hạn. Ghim cũng là giữ lại.
-                action("lock.open", help: "Giữ lại · nếu không sẽ tự xoá \(ExpiryText.string(until: expiresAt))") {
+                action("lock.open", help: String(localized: "Keep · otherwise deleted \(ExpiryText.string(until: expiresAt))")) {
                     viewModel.keep(item)
                 }
                 .foregroundStyle(Color.orange)
             }
-            // Bấm: ghim nhanh vào "Đã ghim" / bỏ ghim. Chuột phải: chọn bảng khác.
+            // Bấm: ghim nhanh vào bảng mặc định / bỏ ghim. Chuột phải: chọn bảng khác.
             action(pinboard == nil ? "pin" : "pin.fill",
-                   help: pinboard.map { "Bỏ ghim khỏi \($0.name) · chuột phải để chuyển bảng" }
-                       ?? "Ghim vào \(ClipboardStore.defaultPinboardName) (⌘P) · chuột phải để chọn bảng") {
+                   help: pinboard.map { String(localized: "Unpin from \($0.name) · right-click to move") }
+                       ?? String(localized: "Pin to \(Pinboard.defaultName) (⌘P) · right-click to choose a board")) {
                 viewModel.togglePin(item)
             }
             .foregroundStyle(pinboard.map { Color(hex: $0.color) } ?? .secondary)
             .contextMenu { PinMenuItems(viewModel: viewModel, item: item) }
 
             if item.kind != .image {
-                action("textformat", help: "Dán dạng text thuần (⇧↩)") { viewModel.pick(item, plainOnly: true) }
+                action("textformat", help: String(localized: "Paste as Plain Text (⇧↩)")) { viewModel.pick(item, plainOnly: true) }
             }
-            action("trash", help: "Xoá (⌘⌫)") { viewModel.delete(item) }
+            action("trash", help: String(localized: "Delete (⌘⌫)")) { viewModel.delete(item) }
         }
         .font(.system(size: 9.5, weight: .medium))
     }
@@ -59,10 +59,10 @@ struct PinMenuItems: View {
             }
         }
         if !viewModel.pinboards.isEmpty { Divider() }
-        Button("Bảng mới…") { viewModel.startCreatingBoard(pinning: item) }
+        Button("New Board…") { viewModel.startCreatingBoard(pinning: item) }
         if item.isPinned {
             Divider()
-            Button("Bỏ ghim") { viewModel.unpin(item) }
+            Button("Unpin") { viewModel.unpin(item) }
         }
     }
 }
@@ -73,16 +73,16 @@ struct CardMenu: View {
     let item: ClipItem
 
     var body: some View {
-        Button("Dán") { viewModel.pick(item) }
+        Button("Paste") { viewModel.pick(item) }
         if item.kind != .image {
-            Button("Dán dạng text thuần") { viewModel.pick(item, plainOnly: true) }
+            Button("Paste as Plain Text") { viewModel.pick(item, plainOnly: true) }
         }
         Divider()
-        Menu("Ghim vào") { PinMenuItems(viewModel: viewModel, item: item) }
+        Menu("Pin To") { PinMenuItems(viewModel: viewModel, item: item) }
         if item.isExpiring {
-            Button("Giữ lại (không tự xoá)") { viewModel.keep(item) }
+            Button("Keep (don’t auto-delete)") { viewModel.keep(item) }
         }
         Divider()
-        Button("Xoá") { viewModel.delete(item) }
+        Button("Delete") { viewModel.delete(item) }
     }
 }

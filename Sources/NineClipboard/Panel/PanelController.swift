@@ -163,16 +163,16 @@ final class PanelController: NSObject, NSWindowDelegate {
         }
         if boards.isEmpty {
             // Chưa có bảng nào: mục đầu tiên tạo luôn bảng mặc định.
-            menu.addItem(ClosureMenuItem(title: ClipboardStore.defaultPinboardName, key: "1") { [viewModel] in
+            menu.addItem(ClosureMenuItem(title: Pinboard.defaultName, key: "1") { [viewModel] in
                 viewModel.pinToDefaultBoard(item)
             })
         }
         menu.addItem(.separator())
-        menu.addItem(ClosureMenuItem(title: "Bảng mới…", key: "n") { [viewModel] in
+        menu.addItem(ClosureMenuItem(title: String(localized: "New Board…"), key: "n") { [viewModel] in
             viewModel.startCreatingBoard(pinning: item)
         })
         if item.isPinned {
-            menu.addItem(ClosureMenuItem(title: "Bỏ ghim", key: "\u{8}") { [viewModel] in viewModel.unpin(item) })
+            menu.addItem(ClosureMenuItem(title: String(localized: "Unpin"), key: "\u{8}") { [viewModel] in viewModel.unpin(item) })
         }
 
         let cardX = StripLayout.cardX(viewModel.selectedIndex) - viewModel.scrollOffset

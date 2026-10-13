@@ -7,7 +7,6 @@ extension ClipboardStore {
     public static let pinboardPalette = [
         "#4F8EF7", "#F25C54", "#F7B32B", "#2BB673", "#9B5DE5", "#00B8D9", "#FF7AB6", "#8D99AE",
     ]
-    public static let defaultPinboardName = "Đã ghim"
 
     public func pinboards() throws -> [Pinboard] {
         try database.queue.read { db in try Pinboard.order(Column("sort_order"), Column("id")).fetchAll(db) }
@@ -66,13 +65,14 @@ extension ClipboardStore {
         }
     }
 
-    /// Ghim nhanh vào bảng "Đã ghim" (tạo bảng nếu chưa có, ví dụ người dùng đã đổi tên hoặc xoá nó).
+    /// Ghim nhanh vào bảng mặc định tên `boardName` (tên đã dịch, ví dụ "Đã ghim"); tạo bảng nếu chưa có,
+    /// ví dụ người dùng đã đổi tên hoặc xoá nó.
     @discardableResult
-    public func pinToDefault(itemID: Int64) throws -> Pinboard {
+    public func pinToDefault(itemID: Int64, boardName: String) throws -> Pinboard {
         let existing = try database.queue.read { db in
-            try Pinboard.filter(Column("name") == Self.defaultPinboardName).order(Column("sort_order")).fetchOne(db)
+            try Pinboard.filter(Column("name") == boardName).order(Column("sort_order")).fetchOne(db)
         }
-        let board = try existing ?? createPinboard(name: Self.defaultPinboardName)
+        let board = try existing ?? createPinboard(name: boardName)
         try pin(itemID: itemID, to: board.id!)
         return board
     }

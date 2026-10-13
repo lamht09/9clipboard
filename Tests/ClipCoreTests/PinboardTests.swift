@@ -87,10 +87,10 @@ import Testing
         let code = try await store.createPinboard(name: "Code")
         let a = try await store.insertOrBump(textCapture("a"), historyLimit: 500, now: t0).item
         let b = try await store.insertOrBump(textCapture("b"), historyLimit: 500, now: t0 + 1).item
-        let first = try await store.pinToDefault(itemID: a.id!)
-        let second = try await store.pinToDefault(itemID: b.id!)
+        let first = try await store.pinToDefault(itemID: a.id!, boardName: "Pinned")
+        let second = try await store.pinToDefault(itemID: b.id!, boardName: "Pinned")
         #expect(first.id == second.id)
-        #expect(try await store.pinboards().map(\.name) == ["Code", ClipboardStore.defaultPinboardName])
+        #expect(try await store.pinboards().map(\.name) == ["Code", "Pinned"])
 
         // Chuyển sang bảng khác: thêm vào cuối bảng đích.
         try await store.pin(itemID: b.id!, to: code.id!)

@@ -8,25 +8,28 @@ struct SettingsView: View {
     var body: some View {
         TabView {
             GeneralTab(model: model)
-                .tabItem { Label("Chung", systemImage: "gearshape") }
+                .tabItem { Label("General", systemImage: "gearshape") }
             PrivacyTab(model: model)
-                .tabItem { Label("Riêng tư", systemImage: "hand.raised") }
+                .tabItem { Label("Privacy", systemImage: "hand.raised") }
             PinboardTab(model: model)
                 .tabItem { Label("Pinboard", systemImage: "pin") }
             PermissionTab(model: model)
-                .tabItem { Label("Quyền", systemImage: "lock.shield") }
+                .tabItem { Label("Permissions", systemImage: "lock.shield") }
             AboutTab()
-                .tabItem { Label("Giới thiệu", systemImage: "info.circle") }
+                .tabItem { Label("About", systemImage: "info.circle") }
         }
         .frame(width: 540, height: 480)
     }
 }
 
 private struct Caption: View {
-    var text: String
-    init(_ text: String) { self.text = text }
+    var text: Text
+    /// Chuỗi viết thẳng trong code được dịch; chuỗi đã có sẵn (lỗi, tên…) thì hiện nguyên văn — giống `Text`.
+    init(_ key: LocalizedStringKey) { text = Text(key) }
+    @_disfavoredOverload
+    init(_ string: some StringProtocol) { text = Text(string) }
     var body: some View {
-        Text(text).font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
+        text.font(.caption).foregroundStyle(.secondary).fixedSize(horizontal: false, vertical: true)
     }
 }
 
@@ -38,59 +41,62 @@ private struct GeneralTab: View {
     var body: some View {
         Form {
             Section {
-                LabeledContent("Phím tắt mở panel") {
+                Picker("Language", selection: $model.language) {
+                    ForEach(AppLanguage.allCases) { Text($0.displayName).tag($0) }
+                }
+                LabeledContent("Open Panel Shortcut") {
                     HStack {
                         ShortcutRecorder(model: model).fixedSize()
                         if model.shortcut != .default {
-                            Button("Mặc định") { model.resetShortcut() }
+                            Button("Default") { model.resetShortcut() }
                         }
                     }
                 }
                 if let message = model.shortcutMessage { Caption(message) }
 
-                Toggle("Chạy khi đăng nhập", isOn: $model.launchAtLogin)
+                Toggle("Launch at Login", isOn: $model.launchAtLogin)
                 if model.loginStatus == .requiresApproval {
                     HStack {
-                        Caption("Cần cho phép 9clipboard trong System Settings › Mục đăng nhập.")
-                        Button("Mở") { model.openLoginItemsSettings() }
+                        Caption("Allow 9clipboard in System Settings › Login Items.")
+                        Button("Open") { model.openLoginItemsSettings() }
                     }
                 }
                 if let error = model.loginError { Caption(error) }
 
                 Toggle(isOn: $model.autoPaste) {
-                    Text("Tự dán vào app đang dùng")
-                    Text("Tắt thì chỉ copy, bạn tự bấm ⌘V.")
+                    Text("Paste into the Active App")
+                    Text("When off, items are only copied and you press ⌘V yourself.")
                 }
             }
 
-            Section("Lịch sử") {
+            Section("History") {
                 Picker(selection: $model.historyLimit) {
-                    ForEach(SettingsModel.historyLimits, id: \.self) { Text("\($0) mục").tag($0) }
+                    ForEach(SettingsModel.historyLimits, id: \.self) { Text("\($0) items").tag($0) }
                 } label: {
-                    Text("Giới hạn lịch sử")
-                    Text("Không tính mục đã ghim. Giảm giới hạn thì mục cũ nhất bị xoá ở lần copy tiếp theo.")
+                    Text("History Limit")
+                    Text("Pinned items don’t count. Lowering the limit deletes the oldest items on your next copy.")
                 }
-                Picker("Ảnh lớn nhất", selection: $model.maxImageMB) {
+                Picker("Largest Image", selection: $model.maxImageMB) {
                     ForEach(SettingsModel.imageLimits, id: \.self) { Text("\($0) MB").tag($0) }
                 }
             }
 
-            Section("Dữ liệu") {
-                LabeledContent("Thư mục") {
+            Section("Data") {
+                LabeledContent("Folder") {
                     HStack {
                         Text((model.dataDirectory.path as NSString).abbreviatingWithTildeInPath)
                             .lineLimit(1).truncationMode(.middle).textSelection(.enabled)
-                        Button("Hiện trong Finder") {
+                        Button("Show in Finder") {
                             NSWorkspace.shared.activateFileViewerSelecting([model.dataDirectory])
                         }
                     }
                 }
-                LabeledContent("Dung lượng đang dùng") {
+                LabeledContent("Disk Usage") {
                     Text(ByteCountFormatter.string(fromByteCount: Int64(model.diskUsage), countStyle: .file))
                 }
                 HStack {
                     Spacer()
-                    Button("Xoá lịch sử…", role: .destructive) { model.clearHistory() }
+                    Button("Clear History…", role: .destructive) { model.clearHistory() }
                 }
             }
         }
@@ -107,18 +113,18 @@ private struct PrivacyTab: View {
         Form {
             Section {
                 Toggle(isOn: $model.detectPasswords) {
-                    Text("Nhận diện mật khẩu và tự xoá")
-                    Text("Mật khẩu copy từ 1Password, Passwords… vẫn hiện (🔒) nhưng tự xoá nếu không bấm “Giữ lại” hoặc ghim.")
+                    Text("Detect and Auto-Delete Passwords")
+                    Text("Passwords copied from 1Password, Passwords… still appear (🔒) but are deleted unless you click “Keep” or pin them.")
                 }
-                Picker("Tự xoá mật khẩu sau", selection: $model.passwordLifetimeMinutes) {
-                    ForEach(SettingsModel.passwordLifetimes, id: \.self) { Text("\($0) phút").tag($0) }
+                Picker("Delete Passwords After", selection: $model.passwordLifetimeMinutes) {
+                    ForEach(SettingsModel.passwordLifetimes, id: \.self) { Text("\($0) min").tag($0) }
                 }
                 .disabled(!model.detectPasswords)
             }
 
             Section {
                 if model.excludedApps.isEmpty {
-                    Caption("Chưa có app nào.")
+                    Caption("No apps yet.")
                 }
                 ForEach(model.excludedApps) { app in
                     HStack {
@@ -127,30 +133,30 @@ private struct PrivacyTab: View {
                         Spacer()
                         Button { model.removeExcludedApp(app) } label: { Image(systemName: "minus.circle") }
                             .buttonStyle(.borderless)
-                            .help("Bỏ loại trừ")
+                            .help("Stop Excluding")
                     }
                 }
                 HStack {
                     Spacer()
-                    Button("Thêm app…") { model.addExcludedApp() }
+                    Button("Add App…") { model.addExcludedApp() }
                 }
             } header: {
-                Text("App bị loại trừ")
+                Text("Excluded Apps")
             } footer: {
-                Caption("Copy từ các app này không bao giờ được ghi vào lịch sử.")
+                Caption("Anything copied from these apps is never saved to history.")
             }
 
-            Section("Xoá lịch sử theo app") {
+            Section("Clear History by App") {
                 if model.sourceApps.isEmpty {
-                    Caption("Lịch sử đang trống.")
+                    Caption("History is empty.")
                 }
                 ForEach(model.sourceApps) { source in
                     HStack {
                         AppIcon(image: SettingsModel.AppInfo(bundleID: source.bundleID).icon)
                         Text(source.name)
                         Spacer()
-                        Text("\(source.count) mục").foregroundStyle(.secondary).monospacedDigit()
-                        Button("Xoá…") { model.clearHistory(fromApp: source) }
+                        Text("\(source.count) items").foregroundStyle(.secondary).monospacedDigit()
+                        Button("Delete…") { model.clearHistory(fromApp: source) }
                     }
                 }
             }
@@ -188,13 +194,13 @@ private struct PinboardTab: View {
             }
             .overlay {
                 if model.app.pinboards.isEmpty {
-                    Caption("Chưa có bảng nào. Bấm 📌 trên thẻ hoặc ⌘P trong panel để ghim.")
+                    Caption("No boards yet. Click 📌 on a card or press ⌘P in the panel to pin.")
                 }
             }
             HStack {
-                Caption("Kéo để sắp xếp lại. Xoá bảng thì các mục được bỏ ghim, không bị xoá.")
+                Caption("Drag to reorder. Deleting a board unpins its items without deleting them.")
                 Spacer()
-                Button("Bảng mới") { model.createPinboard() }
+                Button("New Board") { model.createPinboard() }
             }
         }
         .padding()
@@ -226,15 +232,15 @@ private struct PinboardRow: View {
             .menuStyle(.borderlessButton)
             .menuIndicator(.hidden)
             .fixedSize()
-            .help("Đổi màu")
+            .help("Change Color")
 
-            TextField("Tên bảng", text: name)
+            TextField("Board Name", text: name)
                 .textFieldStyle(.plain)
                 .onSubmit { model.commitName(of: board) }
 
             Button { model.delete(board) } label: { Image(systemName: "trash") }
                 .buttonStyle(.borderless)
-                .help("Xoá bảng")
+                .help("Delete Board")
         }
         .padding(.vertical, 2)
     }
@@ -253,21 +259,22 @@ private struct PermissionTab: View {
                         .font(.title2)
                         .foregroundStyle(model.isTrusted ? .green : .orange)
                     VStack(alignment: .leading, spacing: 2) {
-                        Text(model.isTrusted ? "Đã cấp quyền Trợ năng" : "Chưa cấp quyền Trợ năng")
+                        Text(model.isTrusted ? "Accessibility Access Granted" : "Accessibility Access Not Granted")
                             .font(.headline)
-                        Caption(
-                            model.isTrusted
-                                ? "9clipboard tự dán bằng cách gửi ⌘V vào app đang dùng."
-                                : "Không có quyền thì 9clipboard chỉ copy, bạn tự bấm ⌘V để dán.")
+                        if model.isTrusted {
+                            Caption("9clipboard pastes by sending ⌘V to the active app.")
+                        } else {
+                            Caption("Without access, 9clipboard only copies and you press ⌘V to paste.")
+                        }
                     }
                     Spacer()
                 }
                 HStack {
                     Spacer()
-                    Button("Mở System Settings") { model.openAccessibilitySettings() }
+                    Button("Open System Settings") { model.openAccessibilitySettings() }
                 }
             } footer: {
-                Caption("Quyền này chỉ dùng để gửi phím ⌘V. 9clipboard không cần mạng và không gửi dữ liệu đi đâu.")
+                Caption("This access is only used to send ⌘V. 9clipboard needs no network and never sends your data anywhere.")
             }
         }
         .formStyle(.grouped)
@@ -284,8 +291,8 @@ private struct AboutTab: View {
                 .resizable()
                 .frame(width: 96, height: 96)
             Text("9clipboard").font(.title.bold())
-            Text("Phiên bản \(About.version)").foregroundStyle(.secondary).textSelection(.enabled)
-            Text("Phát triển bởi \(About.author)").font(.headline).padding(.top, 8)
+            Text("Version \(About.version)").foregroundStyle(.secondary).textSelection(.enabled)
+            Text("Developed by \(About.author)").font(.headline).padding(.top, 8)
             Link(About.repositoryLabel, destination: About.repositoryURL)
             Spacer()
             Caption(About.copyright)

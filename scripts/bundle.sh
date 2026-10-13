@@ -27,6 +27,12 @@ if [ "$VARIANT" = dev ]; then
     /usr/libexec/PlistBuddy -c "Set :CFBundleDisplayName 9clipboard Dev" "$PLIST"
 fi
 [ -f Resources/AppIcon.icns ] && cp Resources/AppIcon.icns "$APP/Contents/Resources/"
+# Bản dịch giao diện. Đổi sang binary plist: vừa kiểm cú pháp (sai thì dừng build) vừa nạp nhanh hơn.
+for dir in Resources/*.lproj; do
+    cp -R "$dir" "$APP/Contents/Resources/"
+done
+find "$APP/Contents/Resources" -path '*.lproj/*' \( -name '*.strings' -o -name '*.stringsdict' \) \
+    -exec plutil -convert binary1 {} +
 # Gói resource của SwiftPM (nếu có) để Bundle.module tìm thấy
 for b in "$BIN_DIR"/*.bundle; do
     [ -e "$b" ] && cp -R "$b" "$APP/Contents/Resources/"
