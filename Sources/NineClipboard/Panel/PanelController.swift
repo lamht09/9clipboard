@@ -6,7 +6,7 @@ import SwiftUI
 @MainActor
 final class PanelController: NSObject, NSWindowDelegate {
     /// Cao vừa đủ cho thẻ + lề chứa hiệu ứng phóng to và bóng đổ.
-    static let height: CGFloat = CardView.size + CardStrip.verticalInset * 2
+    static let height: CGFloat = StripLayout.cardSize + StripLayout.verticalInset * 2
     static let maxWidth: CGFloat = 1100
     static let margin: CGFloat = 12
 
@@ -28,6 +28,7 @@ final class PanelController: NSObject, NSWindowDelegate {
         panel.contentView = hosting
         panel.delegate = self
         panel.keyHandler = { [weak self] event in self?.handleKey(event) ?? false }
+        panel.scrollHandler = { [weak self] event in self?.viewModel.scroll(with: event) }
         viewModel.onPick = { [weak self] item, plainOnly in self?.paste(item, plainOnly: plainOnly) }
     }
 

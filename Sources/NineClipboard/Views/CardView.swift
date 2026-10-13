@@ -3,7 +3,7 @@ import ClipCore
 import SwiftUI
 
 struct CardView: View {
-    static let size: CGFloat = 150
+    static let size = StripLayout.cardSize
 
     let item: ClipItem
     let index: Int

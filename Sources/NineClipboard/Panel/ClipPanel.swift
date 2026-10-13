@@ -4,6 +4,8 @@ import AppKit
 final class ClipPanel: NSPanel {
     /// Trả về true nếu đã xử lý phím (khi đó sự kiện không đi tiếp).
     var keyHandler: ((NSEvent) -> Bool)?
+    /// Nhận mọi sự kiện cuộn (con lăn, trackpad) trong panel.
+    var scrollHandler: ((NSEvent) -> Void)?
 
     init() {
         super.init(
@@ -28,26 +30,10 @@ final class ClipPanel: NSPanel {
 
     override func sendEvent(_ event: NSEvent) {
         if event.type == .keyDown, keyHandler?(event) == true { return }
-        if event.type == .scrollWheel, let horizontal = Self.verticalToHorizontal(event) {
-            super.sendEvent(horizontal)
+        if event.type == .scrollWheel, let scrollHandler {
+            scrollHandler(event)
             return
         }
         super.sendEvent(event)
-    }
-
-    /// Dải thẻ cuộn ngang, nên đổi cuộn dọc (con lăn chuột) thành cuộn ngang.
-    private static func verticalToHorizontal(_ event: NSEvent) -> NSEvent? {
-        guard abs(event.scrollingDeltaY) > abs(event.scrollingDeltaX),
-              let cg = event.cgEvent?.copy() else { return nil }
-        let pairs: [(CGEventField, CGEventField)] = [
-            (.scrollWheelEventDeltaAxis1, .scrollWheelEventDeltaAxis2),
-            (.scrollWheelEventFixedPtDeltaAxis1, .scrollWheelEventFixedPtDeltaAxis2),
-            (.scrollWheelEventPointDeltaAxis1, .scrollWheelEventPointDeltaAxis2),
-        ]
-        for (vertical, horizontal) in pairs {
-            cg.setDoubleValueField(horizontal, value: cg.getDoubleValueField(vertical))
-            cg.setDoubleValueField(vertical, value: 0)
-        }
-        return NSEvent(cgEvent: cg)
     }
 }
