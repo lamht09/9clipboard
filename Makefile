@@ -17,6 +17,8 @@ sign: bundle
 
 run: sign
 	-pkill -x NineClipboard
+	@# `open` lỗi -600 nếu bản cũ chưa thoát hẳn → chờ tiến trình biến mất.
+	@while pgrep -x NineClipboard >/dev/null; do sleep 0.1; done
 	open $(APP)
 
 test:
@@ -28,6 +30,8 @@ bench:
 
 install: sign
 	-pkill -x NineClipboard
+	@# `open` lỗi -600 nếu bản cũ chưa thoát hẳn → chờ tiến trình biến mất.
+	@while pgrep -x NineClipboard >/dev/null; do sleep 0.1; done
 	rm -rf /Applications/9clipboard.app
 	cp -R $(APP) /Applications/
 	open /Applications/9clipboard.app
