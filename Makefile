@@ -4,7 +4,7 @@ IDENTITY := 9clipboard Dev
 TOOLCHAIN   := $(shell dirname $$(dirname $$(xcrun --find swift)))
 TEST_FLAGS  := -Xswiftc -plugin-path -Xswiftc $(TOOLCHAIN)/lib/swift/host/plugins/testing
 
-.PHONY: build bundle sign run test install cert clean
+.PHONY: build bundle sign run test bench install cert clean
 
 build:
 	swift build -c release --arch arm64
@@ -21,6 +21,10 @@ run: sign
 
 test:
 	swift test $(TEST_FLAGS)
+
+# Benchmark tìm kiếm ở bản release (mục tiêu < 10ms cho 2000 mục, DESIGN §10).
+bench:
+	swift test -c release -Xswiftc -enable-testing $(TEST_FLAGS) --filter searchesUnder10ms
 
 install: sign
 	-pkill -x NineClipboard

@@ -12,6 +12,8 @@ final class AppModel {
     let store: ClipboardStore
     let previews: PreviewCache
     private(set) var items: [ClipItem] = []
+    /// Tăng sau mỗi lần nạp lại, để panel biết khi nào cần tìm lại.
+    private(set) var revision = 0
 
     init(store: ClipboardStore) {
         self.store = store
@@ -21,6 +23,7 @@ final class AppModel {
     func reload() async {
         do {
             items = try await store.recent()
+            revision += 1
         } catch {
             log.error("reload failed: \(error.localizedDescription)")
         }

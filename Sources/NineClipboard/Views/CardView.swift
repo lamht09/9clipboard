@@ -9,6 +9,8 @@ struct CardView: View {
     let index: Int
     let isSelected: Bool
     let previews: PreviewCache
+    /// Chuỗi tìm đang áp dụng; phần khớp được tô sáng.
+    var highlight = ""
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -58,16 +60,23 @@ struct CardView: View {
         if item.kind == .image {
             imageContent
         } else if let rich = previews.richText(for: item) {
-            Text(rich).lineLimit(6)
+            Text(previews.highlighted(rich, item: item, query: highlight) ?? rich).lineLimit(6)
         } else {
-            let text = (item.plainText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
-            Text(String(text.prefix(600)))
+            plainText
                 .font(CodeApps.isCodeApp(item.sourceBundleID)
                       ? .system(size: 10.5, design: .monospaced)
                       : .system(size: 11.5))
                 .lineLimit(6)
                 .foregroundStyle(item.kind == .link ? Color.accentColor : .primary)
         }
+    }
+
+    private var plainText: Text {
+        if let highlighted = previews.highlightedPlainText(for: item, query: highlight) {
+            return Text(highlighted)
+        }
+        let text = (item.plainText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+        return Text(String(text.prefix(600)))
     }
 
     @ViewBuilder

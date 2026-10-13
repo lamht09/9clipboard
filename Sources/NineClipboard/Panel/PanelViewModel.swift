@@ -10,6 +10,28 @@ final class PanelViewModel {
     private let model: AppModel
     var selectedIndex = 0
 
+    // MARK: Tìm kiếm và lọc (DESIGN §7)
+    /// Nội dung ô tìm kiếm; kết quả chỉ cập nhật sau 80ms ngừng gõ (`activeQuery`).
+    var query = "" {
+        didSet { if query != oldValue { scheduleSearch() } }
+    }
+    private(set) var activeQuery = ""
+    var filter: ClipFilter = .all {
+        didSet { if filter != oldValue { resetPosition() } }
+    }
+    /// Tăng mỗi lần mở panel để ô tìm kiếm lấy lại focus.
+    private(set) var focusToken = 0
+    @ObservationIgnored private var searchTask: Task<Void, Never>?
+    @ObservationIgnored private let engine = SearchEngine()
+    @ObservationIgnored private var cachedKey: ResultKey?
+    @ObservationIgnored private var cachedItems: [ClipItem] = []
+
+    private struct ResultKey: Equatable {
+        var revision: Int
+        var query: String
+        var filter: ClipFilter
+    }
+
     // MARK: Cuộn — tự quản lý thay cho ScrollView (ScrollView không nhận con lăn chuột khi cuộn ngang).
     /// Khoảng đã cuộn sang phải, tính bằng point.
     var scrollOffset: CGFloat = 0
@@ -25,7 +47,21 @@ final class PanelViewModel {
         self.model = model
     }
 
-    var items: [ClipItem] { model.items }
+    /// Các thẻ đang hiện: lịch sử sau khi lọc theo tab và xếp hạng theo chuỗi tìm.
+    var items: [ClipItem] {
+        let key = ResultKey(revision: model.revision, query: activeQuery, filter: filter)
+        if key != cachedKey {
+            cachedItems = engine.search(model.items, query: key.query, filter: key.filter).map(\.item)
+            cachedKey = key
+        }
+        return cachedItems
+    }
+
+    var emptyMessage: String {
+        if !activeQuery.isEmpty { return "Không tìm thấy “\(activeQuery)”" }
+        if model.items.isEmpty { return "Chưa có gì trong lịch sử. Hãy copy thứ gì đó." }
+        return "Không có mục nào ở tab \(filter.label)"
+    }
     var previews: PreviewCache { model.previews }
 
     var selectedItem: ClipItem? {
@@ -33,8 +69,43 @@ final class PanelViewModel {
     }
 
     func resetForOpen() {
+        query = ""
+        filter = .all
+        resetPosition()
+        focusToken += 1
+    }
+
+    private func resetPosition() {
         selectedIndex = 0
         scrollOffset = 0
+    }
+
+    private func scheduleSearch() {
+        searchTask?.cancel()
+        let pending = query
+        // Xoá hết thì hiện lại toàn bộ ngay, không chờ debounce.
+        guard !pending.trimmingCharacters(in: .whitespaces).isEmpty else {
+            applyQuery("")
+            return
+        }
+        searchTask = Task { [weak self] in
+            try? await Task.sleep(for: .milliseconds(80))
+            guard !Task.isCancelled else { return }
+            self?.applyQuery(pending)
+        }
+    }
+
+    private func applyQuery(_ value: String) {
+        guard value != activeQuery else { return }
+        activeQuery = value
+        resetPosition()
+    }
+
+    /// `Tab` / `⇧Tab`: chuyển vòng qua các tab lọc.
+    func cycleFilter(by delta: Int) {
+        let all = ClipFilter.allCases
+        let index = all.firstIndex(of: filter) ?? 0
+        filter = all[(index + delta + all.count) % all.count]
     }
 
     func move(by delta: Int) {

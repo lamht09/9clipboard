@@ -34,7 +34,7 @@ struct CardStrip: View {
             ZStack(alignment: .topLeading) {
                 ForEach(slots) { slot in
                     CardView(item: slot.item, index: slot.index, isSelected: slot.index == viewModel.selectedIndex,
-                             previews: viewModel.previews)
+                             previews: viewModel.previews, highlight: viewModel.activeQuery)
                         // Click một lần là dán luôn; rê chuột qua thì chọn.
                         .onTapGesture { viewModel.click(slot.item) }
                         .onHover { inside in if inside { viewModel.select(slot.item) } }
@@ -52,7 +52,7 @@ struct CardStrip: View {
             .mask(edgeFade(width: geo.size.width))
             .overlay {
                 if items.isEmpty {
-                    Text("Chưa có gì trong lịch sử. Hãy copy thứ gì đó.")
+                    Text(viewModel.emptyMessage)
                         .foregroundStyle(.secondary)
                         .padding(.horizontal, 16)
                         .padding(.vertical, 10)

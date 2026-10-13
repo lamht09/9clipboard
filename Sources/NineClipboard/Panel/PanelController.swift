@@ -5,8 +5,7 @@ import SwiftUI
 
 @MainActor
 final class PanelController: NSObject, NSWindowDelegate {
-    /// Cao vừa đủ cho thẻ + lề chứa hiệu ứng phóng to và bóng đổ.
-    static let height: CGFloat = StripLayout.cardSize + StripLayout.verticalInset * 2
+    static let height = PanelLayout.height
     static let maxWidth: CGFloat = 1100
     static let margin: CGFloat = 12
 
@@ -115,6 +114,9 @@ final class PanelController: NSObject, NSWindowDelegate {
     // MARK: - Bàn phím (DESIGN §6.2)
 
     private func handleKey(_ event: NSEvent) -> Bool {
+        // Bộ gõ đang soạn chữ (ví dụ Telex của hệ thống): để ô tìm kiếm tự xử lý Enter/Esc/mũi tên.
+        if let editor = panel.firstResponder as? NSTextView, editor.hasMarkedText() { return false }
+
         let flags = event.modifierFlags.intersection(.deviceIndependentFlagsMask)
         let cmd = flags.contains(.command)
         let shift = flags.contains(.shift)
@@ -124,8 +126,11 @@ final class PanelController: NSObject, NSWindowDelegate {
             viewModel.move(by: -1)
         case kVK_RightArrow:
             viewModel.move(by: 1)
+        case kVK_Tab:
+            viewModel.cycleFilter(by: shift ? -1 : 1)
         case kVK_Escape:
-            hide()
+            // Lần đầu xoá ô tìm kiếm, lần hai mới đóng.
+            if viewModel.query.isEmpty { hide() } else { viewModel.query = "" }
         case kVK_Return, kVK_ANSI_KeypadEnter:
             viewModel.pick(plainOnly: shift)
         case kVK_Delete where cmd:

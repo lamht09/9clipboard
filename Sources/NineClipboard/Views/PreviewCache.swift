@@ -13,6 +13,9 @@ final class PreviewCache {
     private var richTexts: [String: AttributedString] = [:]
     /// Mục đã nạp (kể cả nạp hỏng), để không nạp lại liên tục khi view vẽ lại.
     @ObservationIgnored private var requested: Set<String> = []
+    /// Bản tô sáng theo chuỗi tìm hiện tại; đổi chuỗi tìm thì bỏ hết.
+    @ObservationIgnored private var highlightQuery = ""
+    @ObservationIgnored private var highlights: [String: AttributedString] = [:]
 
     init(store: ClipboardStore) {
         self.store = store
@@ -45,6 +48,56 @@ final class PreviewCache {
             }
         }
         return nil
+    }
+
+    // MARK: - Tô sáng phần khớp tìm kiếm
+
+    /// Plain text có tô sáng. Nếu chỗ khớp đầu tiên nằm sâu trong text thì cắt bớt phần đầu
+    /// (thêm "…") để chỗ khớp lọt vào 6 dòng của thẻ.
+    func highlightedPlainText(for item: ClipItem, query: String) -> AttributedString? {
+        cachedHighlight(key: item.contentHash + "|plain", query: query) {
+            let full = (item.plainText ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
+            let ranges = Highlighter.ranges(of: query, in: full)
+            var start = 0
+            if let first = ranges.first, first.lowerBound > 80 { start = first.lowerBound - 30 }
+            let body = String(full[full.index(full.startIndex, offsetBy: start)...].prefix(600))
+            var text = AttributedString(start > 0 ? "…" + body : body)
+            Self.apply(ranges, shift: (start > 0 ? 1 : 0) - start, to: &text)
+            return text
+        }
+    }
+
+    /// Rich text (đã dựng sẵn) có tô sáng.
+    func highlighted(_ rich: AttributedString, item: ClipItem, query: String) -> AttributedString? {
+        cachedHighlight(key: item.contentHash + "|rich", query: query) {
+            var text = rich
+            Self.apply(Highlighter.ranges(of: query, in: String(rich.characters)), shift: 0, to: &text)
+            return text
+        }
+    }
+
+    private func cachedHighlight(key: String, query: String, make: () -> AttributedString) -> AttributedString? {
+        guard !query.isEmpty else { return nil }
+        if query != highlightQuery {
+            highlights.removeAll()
+            highlightQuery = query
+        }
+        if let cached = highlights[key] { return cached }
+        let text = make()
+        highlights[key] = text
+        return text
+    }
+
+    private static func apply(_ ranges: [Range<Int>], shift: Int, to text: inout AttributedString) {
+        let count = text.characters.count
+        for range in ranges {
+            let lower = range.lowerBound + shift
+            let upper = min(range.upperBound + shift, count)
+            guard lower >= 0, lower < upper else { continue }
+            let start = text.characters.index(text.startIndex, offsetBy: lower)
+            let end = text.characters.index(start, offsetBy: upper - lower)
+            text[start..<end].backgroundColor = Color.yellow.opacity(0.45)
+        }
     }
 
     /// Dựng AttributedString cho thẻ: giữ đậm/nghiêng/gạch chân, thu nhỏ cỡ chữ về 10–15pt,
