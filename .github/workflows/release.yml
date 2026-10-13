@@ -85,8 +85,10 @@ jobs:
           security set-key-partition-list -S apple-tool:,apple: -s -k "$KC_PASS" "$KEYCHAIN" >/dev/null
           security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
 
+      # Luôn ghi "./9clipboard.app": codesign hiểu đối số bắt đầu bằng chữ số là PID
+      # ("9clipboard.app: No such process").
       - name: Sign
-        run: codesign --force --deep --options runtime --keychain "$KEYCHAIN" --sign "$IDENTITY" 9clipboard.app
+        run: codesign --force --deep --options runtime --keychain "$KEYCHAIN" --sign "$IDENTITY" ./9clipboard.app
 
       # Chữ ký phải hợp lệ và trỏ đúng chứng chỉ đã công bố (RELEASE_CERT_SHA1) — nếu secret bị thay bằng
       # chứng chỉ khác, người dùng sẽ mất quyền Trợ năng khi cập nhật, nên dừng ở đây.
@@ -95,8 +97,8 @@ jobs:
           EXPECTED_SHA1: ${{ vars.RELEASE_CERT_SHA1 }}
         run: |
           set -euo pipefail
-          codesign --verify --strict --deep --verbose=2 9clipboard.app
-          REQ=$(codesign -d -r- 9clipboard.app 2>&1)
+          codesign --verify --strict --deep --verbose=2 ./9clipboard.app
+          REQ=$(codesign -d -r- ./9clipboard.app 2>&1)
           echo "$REQ"
           test -n "$EXPECTED_SHA1"
           echo "$REQ" | grep -qi "certificate leaf = H\"$EXPECTED_SHA1\""
@@ -109,7 +111,7 @@ jobs:
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
-          ditto -c -k --keepParent 9clipboard.app "9clipboard-$VERSION.zip"
+          ditto -c -k --keepParent ./9clipboard.app "9clipboard-$VERSION.zip"
 
       - name: Create GitHub Release
         env:
