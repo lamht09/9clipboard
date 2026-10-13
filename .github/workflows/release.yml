@@ -120,7 +120,12 @@ jobs:
           PRERELEASE=""
           [[ "$GITHUB_REF_NAME" == *-* ]] && PRERELEASE="--prerelease"
           cat > notes.md <<'NOTES'
-          > **Install:** unzip, move `9clipboard.app` to `/Applications`, then open it.
+          > **Quick install / update** (no Gatekeeper prompt):
+          > ```sh
+          > curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
+          > ```
+          >
+          > **Manual install:** unzip, move `9clipboard.app` to `/Applications`, then open it.
           > The app is signed with the project's self-signed certificate (not notarized), so on first launch
           > macOS will block it: go to **System Settings → Privacy & Security → Open Anyway**, or run
           > `xattr -dr com.apple.quarantine /Applications/9clipboard.app`.

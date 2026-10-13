@@ -19,6 +19,18 @@ A free, open-source **clipboard manager for Mac** that keeps your **clipboard hi
 
 ## Install a release
 
+### Quick install (recommended)
+
+Paste this into Terminal:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
+```
+
+It downloads the latest release, checks that it is signed with the 9clipboard release certificate, installs it to `/Applications` and opens it. Files downloaded by `curl` are not flagged by macOS, so there is **no Gatekeeper prompt**. Run the same command again to update. Then grant Accessibility access when asked (needed to paste with ⌘V).
+
+### Manual install
+
 1. Download `9clipboard-<version>.zip` from [Releases](https://github.com/lamht09/9clipboard/releases), unzip it and move `9clipboard.app` to `/Applications`.
 2. Open it. The app is signed with a self-signed certificate, not notarized by Apple, so macOS blocks it the first time **every new version** is opened: go to System Settings › Privacy & Security › **Open Anyway**. Or skip that prompt by clearing the download flag before opening:
    ```sh

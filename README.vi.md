@@ -19,6 +19,18 @@ Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lư
 
 ## Cài bản phát hành
 
+### Cài nhanh (khuyên dùng)
+
+Dán lệnh này vào Terminal:
+
+```sh
+curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
+```
+
+Lệnh này tải bản mới nhất, kiểm tra app được ký bằng chứng chỉ release của 9clipboard, cài vào `/Applications` rồi mở app. File tải bằng `curl` không bị macOS gắn cờ nên **không có hộp thoại Gatekeeper**. Chạy lại đúng lệnh này để cập nhật. Sau đó cấp quyền Trợ năng khi được hỏi (để dán bằng ⌘V).
+
+### Cài thủ công
+
 1. Tải `9clipboard-<phiên bản>.zip` ở trang [Releases](https://github.com/lamht09/9clipboard/releases), giải nén và chuyển `9clipboard.app` vào `/Applications`.
 2. Mở app. App ký bằng chứng chỉ tự ký, không được Apple công chứng (notarize), nên macOS chặn lần mở đầu của **mỗi bản mới**: vào System Settings › Quyền riêng tư & Bảo mật › **Vẫn mở** (Open Anyway). Hoặc bỏ qua bước này bằng cách xoá cờ tải về trước khi mở:
    ```sh
