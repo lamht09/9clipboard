@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-/// Xoá lịch sử hàng loạt (DESIGN §6.3, §6.4, PLAN M8). Mục đã ghim luôn được giữ.
+/// Xoá lịch sử hàng loạt. Mục đã ghim luôn được giữ.
 extension ClipboardStore {
     /// Một app nguồn có mục trong lịch sử (chưa ghim).
     public struct SourceApp: Sendable, Hashable, Identifiable {

@@ -107,7 +107,7 @@ private func matches(_ query: String, _ text: String) -> FuzzyMatcher.Match? {
             item((0..<Int.random(in: 5...60, using: &rng)).map { _ in words.randomElement(using: &rng)! }
                 .joined(separator: " ") + " \(i)", age: Double(i))
         }
-        // Mục tiêu 10ms (DESIGN §10) là cho bản release; `make test` chạy bản debug chậm hơn nhiều.
+        // Mục tiêu 10ms là cho bản release; `make test` chạy bản debug chậm hơn nhiều.
         #if DEBUG
         let limit = Duration.milliseconds(120)
         #else

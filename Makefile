@@ -28,7 +28,7 @@ run: sign
 test:
 	swift test $(TEST_FLAGS)
 
-# Benchmark tìm kiếm ở bản release (mục tiêu < 10ms cho 2000 mục, DESIGN §10).
+# Benchmark tìm kiếm ở bản release (mục tiêu < 10ms cho 2000 mục).
 bench:
 	swift test -c release -Xswiftc -enable-testing $(TEST_FLAGS) --filter searchesUnder10ms
 
@@ -43,7 +43,7 @@ install: sign
 cert:
 	scripts/create-dev-cert.sh
 
-# Tạo chứng chỉ ký bản phát hành cho CI (chạy một lần, xem docs/RELEASE.md).
+# Tạo chứng chỉ ký bản phát hành cho CI (chạy một lần).
 release-cert:
 	scripts/create-release-cert.sh
 

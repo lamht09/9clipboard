@@ -3,7 +3,7 @@ import ClipCore
 import Observation
 import SwiftUI
 
-/// Xem trước cỡ lớn (phím Space, DESIGN §6.2): nổi phía trên dải thẻ, đi theo thẻ đang chọn.
+/// Xem trước cỡ lớn (phím Space): nổi phía trên dải thẻ, đi theo thẻ đang chọn.
 struct LargePreviewView: View {
     var viewModel: PanelViewModel
     var loader: LargePreviewLoader

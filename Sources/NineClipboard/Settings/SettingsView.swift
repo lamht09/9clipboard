@@ -1,7 +1,7 @@
 import ClipCore
 import SwiftUI
 
-/// Cửa sổ Settings 4 tab (DESIGN §6.4) + tab Giới thiệu.
+/// Cửa sổ Settings 4 tab + tab Giới thiệu.
 struct SettingsView: View {
     var model: SettingsModel
 

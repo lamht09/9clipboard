@@ -1,7 +1,7 @@
 import ClipCore
 import SwiftUI
 
-/// Ô tìm kiếm luôn giữ focus khi panel mở, nên gõ ở đâu cũng vào đây (DESIGN §6.2).
+/// Ô tìm kiếm luôn giữ focus khi panel mở, nên gõ ở đâu cũng vào đây.
 /// Dùng TextField thật (không tự bắt phím) để bộ gõ tiếng Việt của hệ thống vẫn hoạt động.
 struct SearchBar: View {
     @Bindable var viewModel: PanelViewModel

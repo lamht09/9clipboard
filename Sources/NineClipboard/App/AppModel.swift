@@ -91,7 +91,7 @@ final class AppModel {
         await perform("keep") { try await $0.keep(itemID: id) }
     }
 
-    // MARK: - Pinboard (M6)
+    // MARK: - Pinboard
 
     func pinboard(id: Int64?) -> Pinboard? {
         guard let id else { return nil }
@@ -147,7 +147,7 @@ final class AppModel {
         await perform("reorderPinboards") { try await $0.reorderPinboards(ids) }
     }
 
-    // MARK: - Xoá lịch sử (M8) — mục đã ghim luôn được giữ
+    // MARK: - Xoá lịch sử — mục đã ghim luôn được giữ
 
     /// `bundleID` = nil: xoá mọi mục chưa ghim.
     func clearHistory(fromApp bundleID: String? = nil) async {

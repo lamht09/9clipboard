@@ -1,6 +1,6 @@
 import Foundation
 
-/// File ảnh nằm ngoài DB (DESIGN §4):
+/// File ảnh nằm ngoài DB:
 /// - `blobs/<2 ký tự đầu>/<content_hash>.png`: ảnh gốc
 /// - `thumbs/<content_hash>.jpg|.png`: thumbnail cho thẻ
 public struct BlobStore: Sendable {

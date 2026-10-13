@@ -2,7 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 
 /// Phím tắt toàn cục qua Carbon `RegisterEventHotKey` (không cần quyền).
-/// Thay cho thư viện KeyboardShortcuts — xem docs/STATE.md.
+/// Thay cho thư viện KeyboardShortcuts: thư viện đó dùng `@State`, không build được khi chỉ có Command Line Tools.
 @MainActor
 final class HotkeyManager {
     struct Shortcut: Equatable, Codable {

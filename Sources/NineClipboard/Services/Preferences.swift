@@ -1,6 +1,6 @@
 import Foundation
 
-/// Cài đặt lưu trong UserDefaults (DESIGN §4).
+/// Cài đặt lưu trong UserDefaults.
 @MainActor
 enum Preferences {
     private static let defaults = UserDefaults.standard

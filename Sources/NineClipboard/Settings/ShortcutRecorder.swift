@@ -2,7 +2,7 @@ import AppKit
 import Carbon.HIToolbox
 import SwiftUI
 
-/// Ô ghi phím tắt tự làm (thay `KeyboardShortcuts.Recorder`, xem STATE.md).
+/// Ô ghi phím tắt tự làm (thay `KeyboardShortcuts.Recorder`, thư viện đó không build được khi chỉ có Command Line Tools).
 /// Bấm vào ô → bấm tổ hợp mới; `Esc` hoặc click ra ngoài để huỷ.
 struct ShortcutRecorder: NSViewRepresentable {
     var model: SettingsModel

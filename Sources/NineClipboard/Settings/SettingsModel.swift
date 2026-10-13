@@ -3,7 +3,7 @@ import ClipCore
 import Observation
 import ServiceManagement
 
-/// Trạng thái cửa sổ Settings (DESIGN §6.4). Đọc/ghi thẳng `Preferences`; không dùng @State (xem STATE.md).
+/// Trạng thái cửa sổ Settings. Đọc/ghi thẳng `Preferences`; không dùng @State (Command Line Tools thiếu plugin `SwiftUIMacros`).
 @MainActor
 @Observable
 final class SettingsModel {

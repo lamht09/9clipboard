@@ -27,7 +27,7 @@ final class StatusItemController: NSObject, NSMenuDelegate {
         updateIcon()
     }
 
-    /// Icon đổi sang `pause.circle` khi đang tạm dừng (DESIGN §6.3).
+    /// Icon đổi sang `pause.circle` khi đang tạm dừng.
     func updateIcon() {
         let paused = privacy.isPaused
         let symbol = paused ? "pause.circle" : "list.clipboard"

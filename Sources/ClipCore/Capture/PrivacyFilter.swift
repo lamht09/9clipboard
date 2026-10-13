@@ -1,6 +1,6 @@
 import Foundation
 
-/// Quyết định xử lý một lần copy (DESIGN §8).
+/// Quyết định xử lý một lần copy.
 public struct PrivacyFilter: Sendable {
     public enum Decision: Sendable, Equatable {
         case record

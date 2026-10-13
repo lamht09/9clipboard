@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Tạo chứng chỉ tự ký "9clipboard Release" để CI ký bản phát hành (chạy một lần; xem docs/RELEASE.md).
+# Tạo chứng chỉ tự ký "9clipboard Release" để CI ký bản phát hành (chạy một lần).
 # Chạy được trên macOS hoặc Linux (chỉ cần openssl; gh nếu muốn đẩy secret lên GitHub luôn).
 #
 # Kết quả nằm trong OUT_DIR (mặc định ~/9clipboard-release-cert, ngoài repo để không lỡ commit):

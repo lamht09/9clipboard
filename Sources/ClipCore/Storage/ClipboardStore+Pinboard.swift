@@ -1,7 +1,7 @@
 import Foundation
 import GRDB
 
-/// Pinboard và ghim (DESIGN §4, PLAN M6). Mục đã ghim không bị retention xoá.
+/// Pinboard và ghim. Mục đã ghim không bị retention xoá.
 extension ClipboardStore {
     /// Màu gán lần lượt cho bảng mới.
     public static let pinboardPalette = [

@@ -1,6 +1,6 @@
 import Foundation
 
-/// Chấm điểm khớp giữa chuỗi tìm và một mục (DESIGN §7). Cả hai đều đã qua `TextNormalizer`
+/// Chấm điểm khớp giữa chuỗi tìm và một mục. Cả hai đều đã qua `TextNormalizer`
 /// và được chuyển thành mảng scalar để so sánh nhanh.
 public enum FuzzyMatcher {
     public struct Match: Sendable, Equatable {

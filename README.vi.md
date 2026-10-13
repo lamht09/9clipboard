@@ -10,8 +10,6 @@ Trình quản lý lịch sử clipboard cho macOS (Apple Silicon). Bấm **⌥V*
 - Giao diện tiếng Anh và tiếng Việt (theo ngôn ngữ của máy, đổi trong Cài đặt › Chung)
 - Dữ liệu chỉ nằm trên máy, không có network
 
-Thiết kế: [docs/DESIGN.md](docs/DESIGN.md) · Kế hoạch: [docs/PLAN.md](docs/PLAN.md) · Tiến độ: [docs/STATE.md](docs/STATE.md)
-
 ## Yêu cầu
 
 - macOS 14 trở lên, Apple Silicon (mọi máy Apple Silicon, kể cả M1, đều cập nhật được lên macOS 14)
@@ -38,7 +36,7 @@ Các lệnh khác:
 | Lệnh | Việc |
 |---|---|
 | `make run` | Build, ký và chạy từ `build/9clipboard-dev.app` |
-| `make test` | Chạy unit test của `ClipCore` (đừng dùng `swift test` trần, xem STATE.md) |
+| `make test` | Chạy unit test của `ClipCore` (đừng dùng `swift test` trần: chỉ có Command Line Tools thì thỉnh thoảng không nạp được plugin `TestingMacros`) |
 | `make bench` | Đo tìm kiếm 2000 mục ở bản release (mục tiêu < 10ms) |
 | `scripts/make-icon.sh` | Vẽ lại `Resources/AppIcon.icns` |
 
@@ -46,7 +44,7 @@ Các lệnh khác:
 
 **Bản build trên máy là một app riêng:** `make run` / `make install` tạo **9clipboard Dev** (bundle ID `io.github.lamht09.9clipboard.dev`, dữ liệu ở `~/Library/Application Support/9clipboard-dev/`), nên không tranh quyền Trợ năng hay lịch sử với bản release đã cài.
 
-**Bản phát hành** do GitHub Actions build và ký khi push tag `v*`, xem [docs/RELEASE.md](docs/RELEASE.md).
+**Bản phát hành** do GitHub Actions build và ký khi push tag `v*`, job ký chờ duyệt tay trong environment `release`. Thiết lập một lần: `make release-cert` tạo chứng chỉ và lưu thành secret của environment (xem `.github/workflows/release.yml`).
 
 ## Cấp quyền
 

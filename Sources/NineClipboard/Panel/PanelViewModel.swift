@@ -3,14 +3,14 @@ import AppKit
 import SwiftUI
 import Observation
 
-/// Trạng thái hiển thị của panel (thay cho @State — xem STATE.md).
+/// Trạng thái hiển thị của panel (thay cho @State: Command Line Tools thiếu plugin `SwiftUIMacros`).
 @MainActor
 @Observable
 final class PanelViewModel {
     private let model: AppModel
     var selectedIndex = 0
 
-    // MARK: Tìm kiếm và lọc (DESIGN §7)
+    // MARK: Tìm kiếm và lọc
     /// Nội dung ô tìm kiếm; kết quả chỉ cập nhật sau 80ms ngừng gõ (`activeQuery`).
     var query = "" {
         didSet { if query != oldValue { scheduleSearch() } }
@@ -26,7 +26,7 @@ final class PanelViewModel {
     @ObservationIgnored private var cachedKey: ResultKey?
     @ObservationIgnored private var cachedItems: [ClipItem] = []
 
-    // MARK: Pinboard (M6)
+    // MARK: Pinboard
     /// Ô nhập tên bảng ngay trên thanh tab (tạo mới hoặc đổi tên). Không dùng NSAlert vì nó
     /// phải kích hoạt app, làm app đang dùng mất focus.
     var boardEditor: BoardEditor?
@@ -63,7 +63,7 @@ final class PanelViewModel {
     @ObservationIgnored private var dragStartOffset: CGFloat?
     @ObservationIgnored private var lastDragEnd = Date.distantPast
 
-    /// Callback khi người dùng chọn dán (M3 nối vào PasteService).
+    /// Callback khi người dùng chọn dán.
     var onPick: ((ClipItem, _ plainOnly: Bool) -> Void)?
 
     init(model: AppModel) {

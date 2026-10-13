@@ -1,7 +1,7 @@
 name: Release
 
 # Push tag dạng v1.0.0 hoặc v1.0.0-beta.1 → test, build, ký bằng chứng chỉ "9clipboard Release" và tạo GitHub Release.
-# Tag có dấu "-" (beta, rc…) được đánh dấu pre-release. Thiết lập một lần: docs/RELEASE.md.
+# Tag có dấu "-" (beta, rc…) được đánh dấu pre-release. Thiết lập một lần: make release-cert.
 #
 # Tách hai job để private key không bao giờ nằm cạnh code chạy lúc build (SwiftPM plugin, macro của dependency):
 #   build — không có secret, xuất app CHƯA ký thành artifact

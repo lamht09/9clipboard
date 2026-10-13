@@ -10,8 +10,6 @@ A clipboard history manager for macOS (Apple Silicon). Press **⌥V** to open a 
 - English and Vietnamese interface (follows your Mac’s language; change it in Settings › General)
 - All data stays on your Mac — no network access
 
-Docs (in Vietnamese): [design](docs/DESIGN.md) · [plan](docs/PLAN.md) · [status](docs/STATE.md)
-
 ## Requirements
 
 - macOS 14 or later on Apple Silicon (every Apple Silicon Mac, including M1, can update to macOS 14)
@@ -40,7 +38,7 @@ Other commands:
 | Command | What it does |
 |---|---|
 | `make run` | Build, sign and run from `build/9clipboard-dev.app` |
-| `make test` | Run the `ClipCore` unit tests (don't use plain `swift test`, see `docs/STATE.md`) |
+| `make test` | Run the `ClipCore` unit tests (don't use plain `swift test`: with only the Command Line Tools it sometimes fails to load the `TestingMacros` plugin) |
 | `make bench` | Benchmark search over 2,000 items in a release build (target < 10 ms) |
 | `scripts/make-icon.sh` | Redraw `Resources/AppIcon.icns` |
 
@@ -48,7 +46,7 @@ Other commands:
 
 **Local builds are a separate app:** `make run` / `make install` produce **9clipboard Dev** (bundle ID `io.github.lamht09.9clipboard.dev`, data in `~/Library/Application Support/9clipboard-dev/`), so they never fight with an installed release over the Accessibility permission or the history.
 
-**Releases** are built and signed by GitHub Actions when a `v*` tag is pushed; see [docs/RELEASE.md](docs/RELEASE.md) (Vietnamese).
+**Releases** are built and signed by GitHub Actions when a `v*` tag is pushed; the signing job waits for manual approval in the `release` environment. One-time setup: `make release-cert` creates the certificate and stores it as environment secrets (see `.github/workflows/release.yml`).
 
 ## Permissions
 

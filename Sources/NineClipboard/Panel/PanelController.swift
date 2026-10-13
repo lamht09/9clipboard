@@ -41,7 +41,7 @@ final class PanelController: NSObject, NSWindowDelegate {
         viewModel.onPick = { [weak self] item, plainOnly in self?.paste(item, plainOnly: plainOnly) }
     }
 
-    /// Ghi item lên pasteboard, đóng panel rồi gửi ⌘V (DESIGN §5.2).
+    /// Ghi item lên pasteboard, đóng panel rồi gửi ⌘V.
     private func paste(_ item: ClipItem, plainOnly: Bool) {
         guard let id = item.id else { return }
         Task {
@@ -189,7 +189,7 @@ final class PanelController: NSObject, NSWindowDelegate {
         }
     }
 
-    // MARK: - Bàn phím (DESIGN §6.2)
+    // MARK: - Bàn phím
 
     private func handleKey(_ event: NSEvent) -> Bool {
         // Bộ gõ đang soạn chữ (ví dụ Telex của hệ thống): để ô tìm kiếm tự xử lý Enter/Esc/mũi tên.

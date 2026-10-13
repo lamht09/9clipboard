@@ -19,7 +19,7 @@ public enum ClipFilter: Hashable, Sendable {
     }
 }
 
-/// Lọc và xếp hạng lịch sử theo chuỗi tìm (DESIGN §7). Giữ sẵn `search_key` dạng mảng scalar
+/// Lọc và xếp hạng lịch sử theo chuỗi tìm. Giữ sẵn `search_key` dạng mảng scalar
 /// theo `content_hash` để mỗi lần gõ không phải chuyển đổi lại. Chỉ dùng trên một luồng.
 public final class SearchEngine {
     public struct Result: Sendable {
