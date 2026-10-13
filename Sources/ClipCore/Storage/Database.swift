@@ -26,11 +26,11 @@ public struct AppDatabase: Sendable {
 }
 
 public enum DataDirectory {
-    /// `~/Library/Application Support/9clipboard/`, tạo với quyền 0700 nếu chưa có.
-    public static func url() throws -> URL {
+    /// `~/Library/Application Support/<folder>/`, tạo với quyền 0700 nếu chưa có.
+    public static func url(folder: String = "9clipboard") throws -> URL {
         let base = try FileManager.default.url(
             for: .applicationSupportDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-        let dir = base.appendingPathComponent("9clipboard", isDirectory: true)
+        let dir = base.appendingPathComponent(folder, isDirectory: true)
         try ensureDirectory(dir)
         return dir
     }

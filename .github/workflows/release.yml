@@ -1,24 +1,31 @@
 name: Release
 
-# Push tag dạng v1.0.0 hoặc v1.0.0-beta.1 → build, ad-hoc sign, zip và tạo GitHub Release.
-# Tag có dấu "-" (beta, rc…) được đánh dấu pre-release.
+# Push tag dạng v1.0.0 hoặc v1.0.0-beta.1 → test, build, ký bằng chứng chỉ "9clipboard Release" và tạo GitHub Release.
+# Tag có dấu "-" (beta, rc…) được đánh dấu pre-release. Thiết lập một lần: docs/RELEASE.md.
+#
+# Tách hai job để private key không bao giờ nằm cạnh code chạy lúc build (SwiftPM plugin, macro của dependency):
+#   build — không có secret, xuất app CHƯA ký thành artifact
+#   sign  — environment "release" (cần duyệt tay, chỉ cho tag v*), không checkout/build, chỉ ký + phát hành
+# Action được pin theo commit SHA.
 on:
   push:
     tags: ["v*"]
 
-permissions:
-  contents: write
+permissions: {}
 
 jobs:
-  release:
+  build:
     runs-on: macos-15
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
 
       - name: Set version from tag
         run: |
           VERSION="${GITHUB_REF_NAME#v}"
-          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" Resources/Info.plist
           /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $GITHUB_RUN_NUMBER" Resources/Info.plist
 
@@ -30,12 +37,77 @@ jobs:
           swift build -c release --arch arm64
           scripts/bundle.sh
 
-      # Chưa có Developer ID → ad-hoc sign; người dùng cần "Open Anyway" lần đầu.
-      - name: Sign (ad-hoc)
-        run: codesign --force --deep --options runtime --sign - build/9clipboard.app
+      # upload-artifact không giữ quyền thực thi → gói bằng ditto trước.
+      - name: Pack unsigned app
+        run: ditto -c -k --keepParent build/9clipboard.app unsigned.zip
+
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        with:
+          name: unsigned-app
+          path: unsigned.zip
+          retention-days: 1
+
+  sign:
+    needs: build
+    runs-on: macos-15
+    environment: release
+    permissions:
+      contents: write
+    env:
+      KEYCHAIN: ${{ runner.temp }}/signing.keychain-db
+      IDENTITY: 9clipboard Release
+    steps:
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: unsigned-app
+
+      - name: Unpack
+        run: ditto -x -k unsigned.zip .
+
+      # Keychain tạm với mật khẩu ngẫu nhiên; key import với -x (không xuất ra được), chỉ codesign dùng được.
+      - name: Import signing certificate
+        env:
+          P12_BASE64: ${{ secrets.RELEASE_CERT_P12 }}
+          P12_PASSWORD: ${{ secrets.RELEASE_CERT_PASSWORD }}
+        run: |
+          set -euo pipefail
+          umask 077
+          KC_PASS=$(openssl rand -base64 32)
+          P12="$RUNNER_TEMP/cert.p12"
+          printf '%s' "$P12_BASE64" | base64 -D > "$P12"
+          security create-keychain -p "$KC_PASS" "$KEYCHAIN"
+          security set-keychain-settings -lut 900 "$KEYCHAIN"
+          security unlock-keychain -p "$KC_PASS" "$KEYCHAIN"
+          security import "$P12" -k "$KEYCHAIN" -P "$P12_PASSWORD" -x -T /usr/bin/codesign
+          rm -f "$P12"
+          security set-key-partition-list -S apple-tool:,apple: -s -k "$KC_PASS" "$KEYCHAIN" >/dev/null
+          security list-keychains -d user -s "$KEYCHAIN" $(security list-keychains -d user | tr -d '"')
+
+      - name: Sign
+        run: codesign --force --deep --options runtime --keychain "$KEYCHAIN" --sign "$IDENTITY" 9clipboard.app
+
+      # Chữ ký phải hợp lệ và trỏ đúng chứng chỉ đã công bố (RELEASE_CERT_SHA1) — nếu secret bị thay bằng
+      # chứng chỉ khác, người dùng sẽ mất quyền Trợ năng khi cập nhật, nên dừng ở đây.
+      - name: Verify signature
+        env:
+          EXPECTED_SHA1: ${{ vars.RELEASE_CERT_SHA1 }}
+        run: |
+          set -euo pipefail
+          codesign --verify --strict --deep --verbose=2 9clipboard.app
+          REQ=$(codesign -d -r- 9clipboard.app 2>&1)
+          echo "$REQ"
+          test -n "$EXPECTED_SHA1"
+          echo "$REQ" | grep -qi "certificate leaf = H\"$EXPECTED_SHA1\""
+
+      - name: Remove keychain
+        if: always()
+        run: security delete-keychain "$KEYCHAIN" || true
 
       - name: Zip
-        run: ditto -c -k --keepParent build/9clipboard.app "build/9clipboard-$VERSION.zip"
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          ditto -c -k --keepParent 9clipboard.app "9clipboard-$VERSION.zip"
 
       - name: Create GitHub Release
         env:
@@ -45,12 +117,13 @@ jobs:
           [[ "$GITHUB_REF_NAME" == *-* ]] && PRERELEASE="--prerelease"
           cat > notes.md <<'NOTES'
           > **Install:** unzip, move `9clipboard.app` to `/Applications`, then open it.
-          > The app is ad-hoc signed (not notarized), so on first launch macOS will block it:
-          > go to **System Settings → Privacy & Security → Open Anyway**, or run
+          > The app is signed with the project's self-signed certificate (not notarized), so on first launch
+          > macOS will block it: go to **System Settings → Privacy & Security → Open Anyway**, or run
           > `xattr -dr com.apple.quarantine /Applications/9clipboard.app`.
+          > Every release is signed with the same certificate, so the Accessibility permission is kept across updates.
           >
           > Requires macOS 14+ on Apple Silicon.
           NOTES
-          gh release create "$GITHUB_REF_NAME" "build/9clipboard-$VERSION.zip" \
-            --title "9clipboard $VERSION" $PRERELEASE \
+          gh release create "$GITHUB_REF_NAME" "9clipboard-$VERSION.zip" \
+            --repo "$GITHUB_REPOSITORY" --title "9clipboard $VERSION" $PRERELEASE \
             --notes-file notes.md --generate-notes

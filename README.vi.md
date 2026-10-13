@@ -20,25 +20,29 @@ Thiết kế: [docs/DESIGN.md](docs/DESIGN.md) · Kế hoạch: [docs/PLAN.md](d
 
 ```sh
 make cert      # chỉ chạy một lần: tạo chứng chỉ tự ký "9clipboard Dev" trong Keychain
-make install   # build release, ký, copy vào /Applications và mở app
+make install   # build release, ký, copy vào /Applications/9clipboard-dev.app và mở app
 ```
 
 Các lệnh khác:
 
 | Lệnh | Việc |
 |---|---|
-| `make run` | Build, ký và chạy từ `build/9clipboard.app` |
+| `make run` | Build, ký và chạy từ `build/9clipboard-dev.app` |
 | `make test` | Chạy unit test của `ClipCore` (đừng dùng `swift test` trần, xem STATE.md) |
 | `make bench` | Đo tìm kiếm 2000 mục ở bản release (mục tiêu < 10ms) |
 | `scripts/make-icon.sh` | Vẽ lại `Resources/AppIcon.icns` |
 
 **Vì sao cần chứng chỉ tự ký:** macOS nhớ quyền Trợ năng theo chữ ký của app. Ký ad-hoc thì mỗi lần build là một chữ ký mới và quyền bị mất; ký bằng cùng một chứng chỉ thì quyền được giữ.
 
+**Bản build trên máy là một app riêng:** `make run` / `make install` tạo **9clipboard Dev** (bundle ID `io.github.lamht09.9clipboard.dev`, dữ liệu ở `~/Library/Application Support/9clipboard-dev/`), nên không tranh quyền Trợ năng hay lịch sử với bản release đã cài.
+
+**Bản phát hành** do GitHub Actions build và ký khi push tag `v*`, xem [docs/RELEASE.md](docs/RELEASE.md).
+
 ## Cấp quyền
 
 Lần đầu chạy, app xin quyền **Trợ năng (Accessibility)** để gửi phím ⌘V vào app đang dùng:
 
-System Settings › Quyền riêng tư & Bảo mật › Trợ năng › bật **9clipboard**.
+System Settings › Quyền riêng tư & Bảo mật › Trợ năng › bật **9clipboard** (hoặc **9clipboard Dev** với bản build trên máy).
 
 Không cấp cũng dùng được: chọn thẻ thì nội dung được copy, bạn tự bấm ⌘V. Trạng thái quyền xem ở Cài đặt › Quyền.
 

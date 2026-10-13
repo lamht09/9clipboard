@@ -22,25 +22,29 @@ Clone the repo, then:
 
 ```sh
 make cert      # once: creates a self-signed "9clipboard Dev" certificate in your Keychain
-make install   # builds release, signs, copies to /Applications and launches the app
+make install   # builds release, signs, copies to /Applications/9clipboard-dev.app and launches it
 ```
 
 Other commands:
 
 | Command | What it does |
 |---|---|
-| `make run` | Build, sign and run from `build/9clipboard.app` |
+| `make run` | Build, sign and run from `build/9clipboard-dev.app` |
 | `make test` | Run the `ClipCore` unit tests (don't use plain `swift test`, see `docs/STATE.md`) |
 | `make bench` | Benchmark search over 2,000 items in a release build (target < 10 ms) |
 | `scripts/make-icon.sh` | Redraw `Resources/AppIcon.icns` |
 
 **Why a self-signed certificate:** macOS remembers the Accessibility permission by the app's signature. With ad-hoc signing every build gets a new signature and the permission is lost; signing with the same certificate keeps it.
 
+**Local builds are a separate app:** `make run` / `make install` produce **9clipboard Dev** (bundle ID `io.github.lamht09.9clipboard.dev`, data in `~/Library/Application Support/9clipboard-dev/`), so they never fight with an installed release over the Accessibility permission or the history.
+
+**Releases** are built and signed by GitHub Actions when a `v*` tag is pushed; see [docs/RELEASE.md](docs/RELEASE.md) (Vietnamese).
+
 ## Permissions
 
 On first launch the app asks for **Accessibility** permission so it can send ⌘V to the active app:
 
-System Settings › Privacy & Security › Accessibility › enable **9clipboard**.
+System Settings › Privacy & Security › Accessibility › enable **9clipboard** (or **9clipboard Dev** for a local build).
 
 It still works without it: choosing a card copies its content and you press ⌘V yourself. Check the permission status under Settings › Permissions.
 

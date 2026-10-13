@@ -16,7 +16,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         let model: AppModel
         let dir: URL
         do {
-            dir = try DataDirectory.url()
+            dir = try DataDirectory.url(folder: isDevBuild ? "9clipboard-dev" : "9clipboard")
             let database = try AppDatabase.onDisk(at: dir.appendingPathComponent("clips.sqlite"))
             let blobs = try BlobStore(root: dir)
             model = AppModel(store: ClipboardStore(database: database, blobs: blobs))

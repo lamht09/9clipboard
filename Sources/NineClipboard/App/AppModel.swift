@@ -3,7 +3,11 @@ import Foundation
 import Observation
 import os
 
-let log = Logger(subsystem: "io.github.lamht09.9clipboard", category: "app")
+/// Bản dev (`make run`/`make install`) có bundle ID đuôi ".dev" để không tranh quyền Trợ năng
+/// và dữ liệu với bản release cài cùng máy.
+let isDevBuild = Bundle.main.bundleIdentifier?.hasSuffix(".dev") == true
+
+let log = Logger(subsystem: Bundle.main.bundleIdentifier ?? "io.github.lamht09.9clipboard", category: "app")
 
 /// Trạng thái dùng chung giữa menu bar, panel và các service.
 @MainActor
