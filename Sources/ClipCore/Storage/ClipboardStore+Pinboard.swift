@@ -55,6 +55,17 @@ extension ClipboardStore {
         }
     }
 
+    /// Ghim nhanh vào bảng "Đã ghim" (tạo bảng nếu chưa có, ví dụ người dùng đã đổi tên hoặc xoá nó).
+    @discardableResult
+    public func pinToDefault(itemID: Int64) throws -> Pinboard {
+        let existing = try database.queue.read { db in
+            try Pinboard.filter(Column("name") == Self.defaultPinboardName).order(Column("sort_order")).fetchOne(db)
+        }
+        let board = try existing ?? createPinboard(name: Self.defaultPinboardName)
+        try pin(itemID: itemID, to: board.id!)
+        return board
+    }
+
     /// Bỏ ghim và đưa mục lên đầu lịch sử, để mục ghim lâu ngày không bị retention xoá ngay ở lần copy tiếp theo.
     public func unpin(itemID: Int64, now: Date = Date()) throws {
         try database.queue.write { db in

@@ -42,15 +42,19 @@ struct CardStrip: View {
                         .onHover { inside in if inside && viewModel.reorderIndex == nil { viewModel.select(slot.item) } }
                         .contextMenu { CardMenu(viewModel: viewModel, item: slot.item) }
                         // Trong tab Pinboard, kéo thẻ để sắp xếp (kéo khoảng trống vẫn là cuộn).
+                        // Kéo lên thả vào tab bảng khác để chuyển mục sang bảng đó.
                         .gesture(
-                            DragGesture(minimumDistance: 4)
-                                .onChanged { viewModel.reorderChanged(index: slot.index, translation: $0.translation.width) }
+                            DragGesture(minimumDistance: 4, coordinateSpace: .named(PanelLayout.space))
+                                .onChanged {
+                                    viewModel.reorderChanged(index: slot.index, translation: $0.translation, location: $0.location)
+                                }
                                 .onEnded { _ in viewModel.reorderEnded() },
                             including: viewModel.canReorder ? .all : .subviews)
+                        .scaleEffect(dragging && viewModel.dropTarget != nil ? 0.5 : 1)
                         .zIndex(dragging ? 1 : 0)
                         .shadow(color: .black.opacity(dragging ? 0.3 : 0), radius: 10, y: 4)
-                        .offset(x: StripLayout.cardX(slot.index) - viewModel.scrollOffset
-                                    + viewModel.reorderOffset(for: slot.index),
+                        .offset(viewModel.reorderOffset(for: slot.index))
+                        .offset(x: StripLayout.cardX(slot.index) - viewModel.scrollOffset,
                                 y: StripLayout.verticalInset)
                 }
             }
@@ -61,7 +65,11 @@ struct CardStrip: View {
                     .onChanged { viewModel.dragChanged(translation: $0.translation.width) }
                     .onEnded { viewModel.dragEnded(predictedTranslation: $0.predictedEndTranslation.width) }
             )
-            .mask(edgeFade(width: geo.size.width))
+            // Mask kéo dài lên trên để thẻ đang kéo lên thanh tab không bị cắt mất.
+            .mask {
+                edgeFade(width: geo.size.width)
+                    .padding(.top, -(PanelLayout.barTop + PanelLayout.barHeight))
+            }
             .overlay {
                 if items.isEmpty {
                     Text(viewModel.emptyMessage)

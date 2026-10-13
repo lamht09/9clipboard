@@ -82,6 +82,23 @@ import Testing
         #expect(items.allSatisfy { $0.pinboardID == nil && $0.pinOrder == nil })
     }
 
+    @Test func pinToDefaultCreatesBoardOnceAndMovesBetweenBoards() async throws {
+        let (store, _) = try makeStore()
+        let code = try await store.createPinboard(name: "Code")
+        let a = try await store.insertOrBump(textCapture("a"), historyLimit: 500, now: t0).item
+        let b = try await store.insertOrBump(textCapture("b"), historyLimit: 500, now: t0 + 1).item
+        let first = try await store.pinToDefault(itemID: a.id!)
+        let second = try await store.pinToDefault(itemID: b.id!)
+        #expect(first.id == second.id)
+        #expect(try await store.pinboards().map(\.name) == ["Code", ClipboardStore.defaultPinboardName])
+
+        // Chuyển sang bảng khác: thêm vào cuối bảng đích.
+        try await store.pin(itemID: b.id!, to: code.id!)
+        let moved = try #require(try await store.item(id: b.id!))
+        #expect(moved.pinboardID == code.id)
+        #expect(moved.pinOrder == 0)
+    }
+
     @Test func deletingBoardUnpinsItsItems() async throws {
         let (store, _) = try makeStore()
         let board = try await store.createPinboard(name: "Code")

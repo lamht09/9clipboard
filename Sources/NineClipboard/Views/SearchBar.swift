@@ -82,6 +82,7 @@ struct FilterTabs: View {
 
     private func tab(_ filter: ClipFilter, color: Color, board: Pinboard? = nil) -> some View {
         let selected = filter == viewModel.filter
+        let isDropTarget = board != nil && board?.id == viewModel.dropTarget?.id
         return HStack(spacing: 5) {
             if board != nil {
                 Circle()
@@ -95,8 +96,13 @@ struct FilterTabs: View {
         .foregroundStyle(selected ? Color.white : .primary)
         .padding(.horizontal, 10)
         .frame(height: PanelLayout.barHeight - 6)
-        .background(Capsule().fill(selected ? color : .clear))
+        .background(Capsule().fill(selected ? color : isDropTarget ? color.opacity(0.35) : .clear))
+        .scaleEffect(isDropTarget ? 1.1 : 1)
+        .animation(.easeOut(duration: 0.1), value: isDropTarget)
         .contentShape(Capsule())
+        .background(GeometryReader { geo in
+            Color.clear.preference(key: TabFramesKey.self, value: [filter: geo.frame(in: .named(PanelLayout.space))])
+        })
         .onTapGesture { viewModel.filter = filter }
         .contextMenu {
             if let board {

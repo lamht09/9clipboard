@@ -63,6 +63,11 @@ final class AppModel {
         await perform("pin") { try await $0.pin(itemID: itemID, to: boardID) }
     }
 
+    func pinToDefault(_ item: ClipItem) async {
+        guard let id = item.id else { return }
+        await perform("pinToDefault") { try await $0.pinToDefault(itemID: id) }
+    }
+
     func unpin(_ item: ClipItem) async {
         guard let id = item.id else { return }
         await perform("unpin") { try await $0.unpin(itemID: id) }

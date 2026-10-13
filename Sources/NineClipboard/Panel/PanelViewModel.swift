@@ -33,6 +33,12 @@ final class PanelViewModel {
     /// Thẻ đang được kéo để sắp xếp lại trong tab Pinboard.
     private(set) var reorderIndex: Int?
     private(set) var reorderTranslation: CGFloat = 0
+    /// Kéo thẻ lên trên (âm) để thả vào tab của bảng khác.
+    private(set) var reorderLift: CGFloat = 0
+    /// Tab bảng đang nằm dưới con trỏ khi kéo thẻ.
+    private(set) var dropTarget: Pinboard?
+    /// Khung các tab trên thanh lọc, do `FilterTabs` báo lên.
+    @ObservationIgnored var tabFrames: [ClipFilter: CGRect] = [:]
 
     struct BoardEditor {
         enum Mode {
@@ -153,7 +159,12 @@ final class PanelViewModel {
     }
 
     func pinToDefaultBoard(_ item: ClipItem) {
-        Task { await model.createPinboard(name: ClipboardStore.defaultPinboardName, pinning: item) }
+        Task { await model.pinToDefault(item) }
+    }
+
+    /// Nút 📌 trên thẻ: chưa ghim thì ghim vào "Đã ghim", đã ghim (ở bất kỳ bảng nào) thì bỏ ghim.
+    func togglePin(_ item: ClipItem) {
+        item.isPinned ? unpin(item) : pinToDefaultBoard(item)
     }
 
     func unpin(_ item: ClipItem) {
@@ -212,48 +223,78 @@ final class PanelViewModel {
         Task { await model.movePin(item, to: target) }
     }
 
+    /// Đang kéo lên vùng thanh tab: bỏ sắp xếp, chỉ còn khả năng thả vào bảng khác.
+    private var isOverTabBar: Bool { reorderLift < -(StripLayout.cardSize / 3) }
+
     var reorderTarget: Int? {
-        guard let from = reorderIndex else { return nil }
+        guard let from = reorderIndex, !isOverTabBar else { return nil }
         let to = from + Int((reorderTranslation / StripLayout.step).rounded())
         return min(max(to, 0), items.count - 1)
     }
 
-    /// Độ lệch ngang của thẻ `index` khi đang kéo: thẻ được kéo theo chuột, các thẻ nằm giữa dịch sang nhường chỗ.
-    func reorderOffset(for index: Int) -> CGFloat {
-        guard let from = reorderIndex, let to = reorderTarget else { return 0 }
-        if index == from { return reorderTranslation }
-        if from < to, index > from, index <= to { return -StripLayout.step }
-        if to < from, index >= to, index < from { return StripLayout.step }
-        return 0
+    /// Độ lệch của thẻ `index` khi đang kéo: thẻ được kéo theo chuột, các thẻ nằm giữa dịch sang nhường chỗ.
+    func reorderOffset(for index: Int) -> CGSize {
+        guard let from = reorderIndex else { return .zero }
+        if index == from { return CGSize(width: reorderTranslation, height: reorderLift) }
+        guard let to = reorderTarget else { return .zero }
+        if from < to, index > from, index <= to { return CGSize(width: -StripLayout.step, height: 0) }
+        if to < from, index >= to, index < from { return CGSize(width: StripLayout.step, height: 0) }
+        return .zero
     }
 
-    func reorderChanged(index: Int, translation: CGFloat) {
+    /// `location` tính trong toạ độ `PanelLayout.space`, để so với khung các tab.
+    func reorderChanged(index: Int, translation: CGSize, location: CGPoint) {
         if reorderIndex == nil {
             reorderIndex = index
             selectedIndex = index
         }
-        withAnimation(.easeOut(duration: 0.12)) { reorderTranslation = translation }
+        let target = tabFrames.first { filter, frame in
+            guard case .pinboard(let id) = filter, filter != self.filter else { return false }
+            return frame.insetBy(dx: -4, dy: -6).contains(location) && model.pinboard(id: id) != nil
+        }
+        dropTarget = target.flatMap { if case .pinboard(let id) = $0.key { model.pinboard(id: id) } else { nil } }
+        withAnimation(.easeOut(duration: 0.12)) {
+            reorderTranslation = translation.width
+            reorderLift = min(translation.height, 0)
+        }
     }
 
     func reorderEnded() {
         lastDragEnd = Date()
-        guard let from = reorderIndex, let to = reorderTarget, items.indices.contains(from) else {
+        defer { dropTarget = nil }
+        guard let from = reorderIndex, items.indices.contains(from) else {
             reorderIndex = nil
             return
         }
         let item = items[from]
-        guard to != from else {
-            withAnimation(.easeOut(duration: 0.15)) { reorderTranslation = 0 }
+        if let board = dropTarget {
+            // Thả lên tab bảng khác: chuyển mục sang bảng đó (vào cuối bảng).
+            Task {
+                await model.pin(item, to: board)
+                resetReorder()
+            }
+            return
+        }
+        guard let to = reorderTarget, to != from else {
+            withAnimation(.easeOut(duration: 0.15)) {
+                reorderTranslation = 0
+                reorderLift = 0
+            }
             reorderIndex = nil
             return
         }
         Task {
             await model.movePin(item, to: to)
             // Giữ độ lệch tới khi thứ tự mới đã nạp xong, để thẻ không nhảy về chỗ cũ trong chốc lát.
-            reorderIndex = nil
-            reorderTranslation = 0
+            resetReorder()
             selectedIndex = to
         }
+    }
+
+    private func resetReorder() {
+        reorderIndex = nil
+        reorderTranslation = 0
+        reorderLift = 0
     }
 
     func move(by delta: Int) {
