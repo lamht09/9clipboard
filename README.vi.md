@@ -2,7 +2,9 @@
 
 [English](README.md) · **Tiếng Việt**
 
-Trình quản lý lịch sử clipboard cho macOS (Apple Silicon). Bấm **⌥V** để mở dải thẻ ở đáy màn hình, chọn một thẻ là dán luôn vào app đang dùng.
+[![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-black) ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lưu **lịch sử copy/paste** (text, rich text, ảnh) ngay trên máy, không cần mạng — giải pháp nhẹ thay cho Paste và Maccy, viết native bằng Swift/SwiftUI cho macOS (Apple Silicon), hỗ trợ tìm kiếm tiếng Việt không dấu. Bấm **⌥V** để mở dải thẻ ở đáy màn hình, chọn một thẻ là dán luôn vào app đang dùng.
 
 - Lưu text, rich text và ảnh; tìm fuzzy không dấu tiếng Việt (`da nang` → “Đà Nẵng”)
 - Ghim vào các Pinboard, mục đã ghim không bị xoá

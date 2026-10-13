@@ -2,7 +2,9 @@
 
 **English** · [Tiếng Việt](README.vi.md)
 
-A clipboard history manager for macOS (Apple Silicon). Press **⌥V** to open a strip of cards at the bottom of the screen; pick a card and it is pasted straight into the app you are using.
+[![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-black) ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+
+A free, open-source **clipboard manager for Mac** that keeps your **clipboard history** (text, rich text and images) private and offline — a lightweight alternative to Paste and Maccy, built natively in Swift/SwiftUI for macOS (Apple Silicon). Press **⌥V** to open a strip of cards at the bottom of the screen; pick a card and it is pasted straight into the app you are using.
 
 - Keeps text, rich text and images; fuzzy, accent-insensitive search (typing `da nang` finds “Đà Nẵng”)
 - Pin items to Pinboards; pinned items are never deleted
