@@ -1,7 +1,7 @@
 import ClipCore
 import SwiftUI
 
-/// Cửa sổ Settings 4 tab (DESIGN §6.4).
+/// Cửa sổ Settings 4 tab (DESIGN §6.4) + tab Giới thiệu.
 struct SettingsView: View {
     var model: SettingsModel
 
@@ -15,6 +15,8 @@ struct SettingsView: View {
                 .tabItem { Label("Pinboard", systemImage: "pin") }
             PermissionTab(model: model)
                 .tabItem { Label("Quyền", systemImage: "lock.shield") }
+            AboutTab()
+                .tabItem { Label("Giới thiệu", systemImage: "info.circle") }
         }
         .frame(width: 540, height: 480)
     }
@@ -269,5 +271,26 @@ private struct PermissionTab: View {
             }
         }
         .formStyle(.grouped)
+    }
+}
+
+// MARK: - Giới thiệu
+
+private struct AboutTab: View {
+    var body: some View {
+        VStack(spacing: 10) {
+            Spacer()
+            Image(nsImage: NSApp.applicationIconImage)
+                .resizable()
+                .frame(width: 96, height: 96)
+            Text("9clipboard").font(.title.bold())
+            Text("Phiên bản \(About.version)").foregroundStyle(.secondary).textSelection(.enabled)
+            Text("Phát triển bởi \(About.author)").font(.headline).padding(.top, 8)
+            Link(About.repositoryLabel, destination: About.repositoryURL)
+            Spacer()
+            Caption(About.copyright)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
     }
 }
