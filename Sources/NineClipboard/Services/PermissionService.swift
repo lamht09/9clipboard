@@ -48,7 +48,7 @@ enum PermissionService {
         alert.informativeText = message
         alert.addButton(withTitle: "Mở System Settings")
         alert.addButton(withTitle: "Để sau")
-        NSApp.activate()
+        NSApp.bringToFront()
         if alert.runModal() == .alertFirstButtonReturn {
             openSettings()
         }

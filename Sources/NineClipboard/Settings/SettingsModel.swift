@@ -195,7 +195,7 @@ final class SettingsModel {
         alert.alertStyle = .warning
         alert.addButton(withTitle: button).hasDestructiveAction = true
         alert.addButton(withTitle: "Huỷ")
-        NSApp.activate()
+        NSApp.bringToFront()
         return alert.runModal() == .alertFirstButtonReturn
     }
 

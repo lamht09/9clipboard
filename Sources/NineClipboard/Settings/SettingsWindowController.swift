@@ -15,8 +15,10 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let window = window ?? makeWindow()
         self.window = window
         model.refresh()
-        NSApp.activate()
+        NSApp.bringToFront()
         window.makeKeyAndOrderFront(nil)
+        // Phòng khi app chưa kịp thành active: vẫn đưa cửa sổ lên trên cùng.
+        window.orderFrontRegardless()
     }
 
     private func makeWindow() -> NSWindow {
