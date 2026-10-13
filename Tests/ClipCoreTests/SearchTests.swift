@@ -97,7 +97,9 @@ private func matches(_ query: String, _ text: String) -> FuzzyMatcher.Match? {
         #expect(results.first?.item.plainText == "báo giá")
     }
 
-    @Test func searchesUnder10msFor2000Items() {
+    // Đo thời gian thật → runner CI dùng chung dao động, từng làm hỏng bản release. Chỉ đo trên máy.
+    @Test(.disabled(if: ProcessInfo.processInfo.environment["CI"] != nil, "Đo hiệu năng không ổn định trên CI"))
+    func searchesUnder10msFor2000Items() {
         let words = ["báo", "cáo", "tuần", "git", "commit", "Đà", "Nẵng", "https://", "github.com", "func",
                      "let", "var", "Nguyễn", "Văn", "hello", "world", "deploy", "staging", "SELECT", "FROM"]
         var rng = SystemRandomNumberGenerator()
