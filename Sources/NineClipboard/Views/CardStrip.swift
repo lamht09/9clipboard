@@ -36,7 +36,7 @@ struct CardStrip: View {
                     let dragging = slot.index == viewModel.reorderIndex
                     CardView(item: slot.item, index: slot.index, isSelected: slot.index == viewModel.selectedIndex,
                              previews: viewModel.previews, highlight: viewModel.activeQuery,
-                             pinboard: viewModel.pinboard(for: slot.item))
+                             pinboard: viewModel.pinboard(for: slot.item), viewModel: viewModel)
                         // Click một lần là dán luôn; rê chuột qua thì chọn.
                         .onTapGesture { viewModel.click(slot.item) }
                         .onHover { inside in if inside && viewModel.reorderIndex == nil { viewModel.select(slot.item) } }

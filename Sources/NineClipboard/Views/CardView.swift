@@ -13,6 +13,8 @@ struct CardView: View {
     var highlight = ""
     /// Bảng chứa thẻ (nếu đã ghim), để vẽ icon ghim theo màu bảng.
     var pinboard: Pinboard?
+    /// Có thì thẻ đang chọn hiện các nút thao tác ở đầu thẻ.
+    var viewModel: PanelViewModel?
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -45,6 +47,22 @@ struct CardView: View {
             Text(item.kind.label)
                 .font(.system(size: 10, weight: .semibold))
             Spacer(minLength: 4)
+            if isSelected, let viewModel {
+                // Thẻ đang chọn: thay icon app bằng các nút thao tác (icon ghim nằm trong đó).
+                CardActionBar(viewModel: viewModel, item: item, pinboard: pinboard)
+            } else {
+                passiveBadges
+            }
+        }
+        .foregroundStyle(.secondary)
+        .padding(.leading, 8)
+        .padding(.trailing, 5)
+        .frame(height: 24)
+    }
+
+    @ViewBuilder
+    private var passiveBadges: some View {
+        Group {
             if let pinboard {
                 Image(systemName: "pin.fill")
                     .font(.system(size: 9))
@@ -58,9 +76,7 @@ struct CardView: View {
                     .help(item.sourceAppName ?? "")
             }
         }
-        .foregroundStyle(.secondary)
-        .padding(.horizontal, 8)
-        .frame(height: 24)
+        .padding(.trailing, 3)
     }
 
     @ViewBuilder

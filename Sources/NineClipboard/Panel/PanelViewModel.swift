@@ -152,6 +152,10 @@ final class PanelViewModel {
         Task { await model.pin(item, to: board) }
     }
 
+    func pinToDefaultBoard(_ item: ClipItem) {
+        Task { await model.createPinboard(name: ClipboardStore.defaultPinboardName, pinning: item) }
+    }
+
     func unpin(_ item: ClipItem) {
         Task { await model.unpin(item) }
     }
@@ -336,6 +340,10 @@ final class PanelViewModel {
 
     func deleteSelected() {
         guard let item = selectedItem else { return }
+        delete(item)
+    }
+
+    func delete(_ item: ClipItem) {
         Task {
             await model.delete(item)
             selectedIndex = min(selectedIndex, max(items.count - 1, 0))

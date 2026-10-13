@@ -129,8 +129,8 @@ final class PanelController: NSObject, NSWindowDelegate {
         }
         if boards.isEmpty {
             // Chưa có bảng nào: mục đầu tiên tạo luôn bảng mặc định.
-            menu.addItem(ClosureMenuItem(title: ClipboardStore.defaultPinboardName, key: "1") { [model] in
-                Task { await model.createPinboard(name: ClipboardStore.defaultPinboardName, pinning: item) }
+            menu.addItem(ClosureMenuItem(title: ClipboardStore.defaultPinboardName, key: "1") { [viewModel] in
+                viewModel.pinToDefaultBoard(item)
             })
         }
         menu.addItem(.separator())
