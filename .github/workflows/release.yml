@@ -1,0 +1,56 @@
+name: Release
+
+# Push tag dạng v1.0.0 hoặc v1.0.0-beta.1 → build, ad-hoc sign, zip và tạo GitHub Release.
+# Tag có dấu "-" (beta, rc…) được đánh dấu pre-release.
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set version from tag
+        run: |
+          VERSION="${GITHUB_REF_NAME#v}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          /usr/libexec/PlistBuddy -c "Set :CFBundleShortVersionString $VERSION" Resources/Info.plist
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $GITHUB_RUN_NUMBER" Resources/Info.plist
+
+      - name: Test
+        run: swift test
+
+      - name: Build & bundle
+        run: |
+          swift build -c release --arch arm64
+          scripts/bundle.sh
+
+      # Chưa có Developer ID → ad-hoc sign; người dùng cần "Open Anyway" lần đầu.
+      - name: Sign (ad-hoc)
+        run: codesign --force --deep --options runtime --sign - build/9clipboard.app
+
+      - name: Zip
+        run: ditto -c -k --keepParent build/9clipboard.app "build/9clipboard-$VERSION.zip"
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PRERELEASE=""
+          [[ "$GITHUB_REF_NAME" == *-* ]] && PRERELEASE="--prerelease"
+          cat > notes.md <<'NOTES'
+          > **Install:** unzip, move `9clipboard.app` to `/Applications`, then open it.
+          > The app is ad-hoc signed (not notarized), so on first launch macOS will block it:
+          > go to **System Settings → Privacy & Security → Open Anyway**, or run
+          > `xattr -dr com.apple.quarantine /Applications/9clipboard.app`.
+          >
+          > Requires macOS 14+ on Apple Silicon.
+          NOTES
+          gh release create "$GITHUB_REF_NAME" "build/9clipboard-$VERSION.zip" \
+            --title "9clipboard $VERSION" $PRERELEASE \
+            --notes-file notes.md --generate-notes
