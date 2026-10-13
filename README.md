@@ -11,7 +11,7 @@ Thiết kế: [docs/DESIGN.md](docs/DESIGN.md) · Kế hoạch: [docs/PLAN.md](d
 
 ## Yêu cầu
 
-- macOS 14 trở lên, Apple Silicon
+- macOS 14 trở lên, Apple Silicon (mọi máy Apple Silicon, kể cả M1, đều cập nhật được lên macOS 14)
 - Swift 6 (Command Line Tools là đủ, không cần Xcode): `xcode-select --install`
 
 ## Build và cài
