@@ -2,7 +2,7 @@
 # Cài hoặc cập nhật 9clipboard từ GitHub Releases:
 #   curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
 # File tải bằng curl không bị gắn cờ quarantine → Gatekeeper không chặn lần mở đầu.
-# Chọn phiên bản: ... | VERSION=1.0.0-beta.4 bash
+# Chọn phiên bản: ... | VERSION=1.0.0 bash
 set -euo pipefail
 
 REPO="lamht09/9clipboard"
