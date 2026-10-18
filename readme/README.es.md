@@ -43,6 +43,7 @@ La primera vez, macOS te pedirá que permitas **Accesibilidad** a 9clipboard. As
 ## Qué hace
 
 - **Encuentra todo rápido.** Empieza a escribir. No hacen falta tildes ni palabras completas: `cancion` encuentra “Canción”.
+- **Encuentra chino, japonés y coreano por cómo suena.** Escribe pinyin, romaji o consonantes iniciales: `beijing` encuentra “北京”, `tokyo` encuentra “東京タワー”, `ㅎㄱ` encuentra “한국”.
 - **Pega sin formato** al pulsar ⇧Intro.
 - **Arrastrar y soltar.** Arrastra una tarjeta a un documento, un chat, Notas o Finder.
 - **Guarda lo que reutilizas.** Fija tarjetas en Pinboards; las tarjetas fijadas nunca se eliminan.

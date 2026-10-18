@@ -43,6 +43,7 @@ Lần đầu, macOS sẽ hỏi cho phép **Trợ năng** (Accessibility) cho 9cl
 ## Làm được gì
 
 - **Tìm nhanh.** Cứ gõ là tìm. Không cần dấu, không cần gõ đủ chữ: `da nang` ra “Đà Nẵng”.
+- **Tìm tiếng Trung, Nhật, Hàn theo cách đọc.** Gõ pinyin, romaji hoặc phụ âm đầu: `beijing` ra “北京”, `tokyo` ra “東京タワー”, `ㅎㄱ` ra “한국”.
 - **Dán không định dạng** khi bấm ⇧Enter.
 - **Kéo thả.** Kéo thẻ vào tài liệu, ô chat, Notes hay Finder.
 - **Giữ thứ hay dùng.** Ghim thẻ vào Pinboard; thẻ đã ghim không bao giờ bị xoá.

@@ -23,6 +23,8 @@ public struct ClipItem: Codable, Sendable, Identifiable, Hashable {
     public var pinOrder: Int?
     /// Mục nhạy cảm (mật khẩu) tự xoá lúc này nếu người dùng không giữ lại. `nil` = giữ vĩnh viễn.
     public var expiresAt: Date? = nil
+    /// Khoá tìm theo cách đọc (pinyin, romaji, phụ âm đầu Hangul). Xem `PhoneticKey`.
+    public var phoneticKey: String? = nil
 
     public var isPinned: Bool { pinboardID != nil }
     public var isExpiring: Bool { expiresAt != nil }
@@ -43,6 +45,7 @@ public struct ClipItem: Codable, Sendable, Identifiable, Hashable {
         case pinboardID = "pinboard_id"
         case pinOrder = "pin_order"
         case expiresAt = "expires_at"
+        case phoneticKey = "phonetic_key"
     }
 }
 

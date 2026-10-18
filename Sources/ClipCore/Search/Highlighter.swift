@@ -30,10 +30,20 @@ public enum Highlighter {
             }
         }
 
-        guard let match = FuzzyMatcher.match(q, in: normalized) else { return [] }
+        let found: (match: FuzzyMatcher.Match, normalized: [UInt32], origin: [Int])
+        if let match = FuzzyMatcher.match(q, in: normalized) {
+            found = (match, normalized, origin)
+        } else if let phonetic = PhoneticKey.build(String(text.prefix(maxCharacters))),
+                  let match = FuzzyMatcher.match(q, in: phonetic.scalars) {
+            // Khớp theo cách đọc: tô các chữ Hán/kana/Hangul tương ứng.
+            found = (match, phonetic.scalars, phonetic.origin)
+        } else {
+            return []
+        }
         var ranges: [Range<Int>] = []
         // Không tô khoảng trắng: "da nang" tô "Đà" và "Nẵng", không tô dấu cách giữa.
-        for offset in match.positions.filter({ normalized[$0] != FuzzyMatcher.space }).map({ origin[$0] }) {
+        let offsets = found.match.positions.filter { found.normalized[$0] != FuzzyMatcher.space }.map { found.origin[$0] }
+        for offset in offsets {
             if let last = ranges.last, offset <= last.upperBound {
                 ranges[ranges.count - 1] = last.lowerBound..<max(last.upperBound, offset + 1)
             } else {

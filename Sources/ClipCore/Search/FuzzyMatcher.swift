@@ -91,7 +91,8 @@ public enum FuzzyMatcher {
         switch c {
         case 0x30...0x39, 0x61...0x7A, 0x41...0x5A: true
         case 0..<0x80: false
-        default: true  // chữ ngoài ASCII (sau khi bỏ dấu thì tiếng Việt đã về ASCII)
+        // Ngoài ASCII: chữ (Kirin, Hán, kana, Hangul…) và số; dấu câu như «» 「」 。 — thì không.
+        default: Unicode.Scalar(c).map { $0.properties.isAlphabetic || $0.properties.numericType != nil } ?? false
         }
     }
 }

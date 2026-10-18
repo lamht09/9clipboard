@@ -43,6 +43,7 @@ The first time, macOS asks you to allow **Accessibility** for 9clipboard. This l
 ## What it does
 
 - **Finds things fast.** Just start typing. You don’t need accents or whole words: `cafe` finds “Café”.
+- **Finds Chinese, Japanese and Korean by sound.** Type pinyin, romaji or initial consonants: `beijing` finds “北京”, `tokyo` finds “東京タワー”, `ㅎㄱ` finds “한국”.
 - **Pastes without formatting** when you press ⇧Enter.
 - **Drag and drop.** Drag a card into a document, a chat, Notes or Finder.
 - **Keeps what you reuse.** Pin cards to Pinboards; pinned cards are never deleted.

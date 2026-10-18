@@ -43,6 +43,7 @@ Na primeira vez, o macOS pede que você permita **Acessibilidade** para o 9clipb
 ## O que ele faz
 
 - **Encontra tudo rápido.** É só começar a digitar. Não precisa de acentos nem de palavras completas: `sao paulo` encontra “São Paulo”.
+- **Encontra chinês, japonês e coreano pela pronúncia.** Digite pinyin, romaji ou consoantes iniciais: `beijing` encontra “北京”, `tokyo` encontra “東京タワー”, `ㅎㄱ` encontra “한국”.
 - **Cola sem formatação** com ⇧Return.
 - **Arrastar e soltar.** Arraste um cartão para um documento, uma conversa, o Notas ou o Finder.
 - **Guarda o que você reutiliza.** Fixe cartões em Pinboards; cartões fixados nunca são apagados.

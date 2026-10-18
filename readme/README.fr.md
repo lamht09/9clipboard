@@ -43,6 +43,7 @@ La première fois, macOS vous demande d’autoriser l’**Accessibilité** pour 
 ## Ce qu’elle fait
 
 - **Retrouve tout rapidement.** Commencez à taper. Pas besoin d’accents ni de mots complets : `creme brulee` trouve « Crème brûlée ».
+- **Trouve le chinois, le japonais et le coréen à l’oreille.** Tapez le pinyin, le romaji ou les consonnes initiales : `beijing` trouve « 北京 », `tokyo` trouve « 東京タワー », `ㅎㄱ` trouve « 한국 ».
 - **Colle sans mise en forme** avec ⇧Entrée.
 - **Glisser-déposer.** Glissez une carte dans un document, une conversation, Notes ou le Finder.
 - **Garde ce que vous réutilisez.** Épinglez des cartes dans des Pinboards ; les cartes épinglées ne sont jamais supprimées.

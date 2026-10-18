@@ -49,6 +49,26 @@ enum Migrations {
             try db.create(index: "idx_clip_expires", on: "clip_item", columns: ["expires_at"])
         }
 
+        // Tìm theo cách đọc (pinyin, romaji, phụ âm đầu Hangul) và chuẩn hoá thêm ß, œ, kana…
+        migrator.registerMigration("v3") { db in
+            try db.alter(table: "clip_item") { t in
+                t.add(column: "phonetic_key", .text)
+            }
+            try rebuildSearchKeys(db)
+        }
+
         return migrator
+    }
+
+    /// Tính lại khoá tìm kiếm của mọi mục. Gọi lại trong một migration mới mỗi khi đổi
+    /// `TextNormalizer` hay `PhoneticKey`, để lịch sử cũ tìm được theo cách mới.
+    static func rebuildSearchKeys(_ db: Database) throws {
+        let rows = try Row.fetchAll(db, sql: "SELECT id, plain_text FROM clip_item WHERE plain_text IS NOT NULL")
+        let update = try db.makeStatement(sql: "UPDATE clip_item SET search_key = ?, phonetic_key = ? WHERE id = ?")
+        for row in rows {
+            let id: Int64 = row["id"]
+            let text: String = row["plain_text"]
+            try update.execute(arguments: [TextNormalizer.normalize(text), PhoneticKey.make(text), id])
+        }
     }
 }

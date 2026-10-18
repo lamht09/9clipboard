@@ -43,6 +43,7 @@ curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh 
 ## 功能
 
 - **快速尋找。** 直接輸入即可搜尋。不必輸入重音符號或完整單字：`cafe` 能找到「Café」。
+- **用拼音尋找。** 輸入拼音或拼音首字母即可：`beijing` 或 `bj` 都能找到「北京」。日文可用羅馬字（`tokyo` → 「東京タワー」），韓文可用初聲（`ㅎㄱ` → 「한국」）。
 - **按下 ⇧Enter 貼上為純文字**，去除格式。
 - **拖放。** 把卡片拖到文件、聊天視窗、備忘錄或 Finder。
 - **保留常用內容。** 把卡片釘選到 Pinboard；已釘選的卡片永遠不會被刪除。

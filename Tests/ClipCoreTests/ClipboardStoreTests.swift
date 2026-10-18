@@ -32,6 +32,7 @@ import Testing
         let (store, _) = try makeStore()
         let item = try await store.insertOrBump(textCapture("Báo Cáo  Đà Nẵng"), historyLimit: 500).item
         #expect(item.searchKey == "bao cao da nang")
+        #expect(item.phoneticKey == nil)
         let reps = try await store.representations(itemID: item.id!)
         #expect(reps.map(\.uti) == [UTI.plainText])
     }
@@ -83,4 +84,25 @@ import Testing
         try String.fetchAll($0, sql: "SELECT typeof(created_at) || typeof(last_used_at) FROM clip_item")
     }
     #expect(types == ["realreal"])
+}
+
+@Suite struct SearchKeyMigrationTests {
+    @Test func v3RebuildsKeysOfOldItems() throws {
+        let queue = try DatabaseQueue()
+        try Migrations.migrator.migrate(queue, upTo: "v2")
+        try queue.write { db in
+            // Khoá cũ kiểu v2: chưa đổi ß, chưa có cách đọc.
+            try db.execute(sql: """
+                INSERT INTO clip_item (kind, content_hash, plain_text, search_key, byte_size, created_at, last_used_at)
+                VALUES ('text', 'a', 'Straße', 'straße', 7, 0, 0), ('text', 'b', '北京', '北京', 6, 0, 0),
+                       ('image', 'c', NULL, NULL, 100, 0, 0)
+                """)
+        }
+        try Migrations.migrator.migrate(queue)
+        let items = try queue.read { db in try ClipItem.order(Column("content_hash")).fetchAll(db) }
+        #expect(items.map(\.searchKey) == ["strasse", "北京", nil])
+        #expect(items[0].phoneticKey == nil)
+        #expect(items[1].phoneticKey?.contains("beijing") == true)
+        #expect(items[2].phoneticKey == nil)
+    }
 }

@@ -61,7 +61,8 @@ public actor ClipboardStore {
                 useCount: 0,
                 pinboardID: nil,
                 pinOrder: nil,
-                expiresAt: expiresAt
+                expiresAt: expiresAt,
+                phoneticKey: capture.plainText.flatMap(PhoneticKey.make)
             )
             try item.insert(db)
             guard let id = item.id else { throw DatabaseError(message: "missing rowid") }

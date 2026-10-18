@@ -43,6 +43,7 @@ Beim ersten Mal bittet macOS dich, 9clipboard Zugriff auf die **Bedienungshilfen
 ## Was es kann
 
 - **Findet alles schnell.** Einfach lostippen. Akzente oder ganze Wörter sind nicht nötig: `munchen` findet „München“.
+- **Findet Chinesisch, Japanisch und Koreanisch nach Aussprache.** Tippe Pinyin, Romaji oder Anfangskonsonanten: `beijing` findet „北京“, `tokyo` findet „東京タワー“, `ㅎㄱ` findet „한국“. Auch `strasse` findet „Straße“.
 - **Ohne Formatierung einsetzen** mit ⇧Eingabe.
 - **Drag & Drop.** Ziehe eine Karte in ein Dokument, einen Chat, Notizen oder den Finder.
 - **Behält, was du oft brauchst.** Hefte Karten an Pinboards an; angeheftete Karten werden nie gelöscht.

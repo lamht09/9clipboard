@@ -9,7 +9,8 @@ private func item(_ text: String, kind: ClipKind = .text, age: TimeInterval = 0)
         searchKey: kind == .image ? nil : TextNormalizer.normalize(text),
         sourceBundleID: nil, sourceAppName: nil, byteSize: text.utf8.count,
         imageWidth: nil, imageHeight: nil, createdAt: date, lastUsedAt: date,
-        useCount: 0, pinboardID: nil, pinOrder: nil)
+        useCount: 0, pinboardID: nil, pinOrder: nil,
+        phoneticKey: kind == .image ? nil : PhoneticKey.make(text))
 }
 
 private func matches(_ query: String, _ text: String) -> FuzzyMatcher.Match? {
@@ -121,6 +122,49 @@ private func matches(_ query: String, _ text: String) -> FuzzyMatcher.Match? {
             let elapsed = ContinuousClock.now - start
             #expect(elapsed < limit, "\(query): \(elapsed)")
         }
+    }
+}
+
+@Suite struct PhoneticSearchTests {
+    let items = [
+        item("我在北京工作", age: 10),
+        item("東京タワーに行く", age: 20),
+        item("한국어 공부", age: 30),
+        item("hello world", age: 40),
+    ]
+
+    @Test(arguments: [
+        ("beijing", "我在北京工作"),
+        ("bj", "我在北京工作"),
+        ("gongzuo", "我在北京工作"),
+        ("tokyo", "東京タワーに行く"),
+        ("ㅎㄱㅇ", "한국어 공부"),
+        ("ㄱㅂ", "한국어 공부"),
+    ])
+    func findsByReading(query: String, expected: String) {
+        let results = SearchEngine().search(items, query: query, filter: .all)
+        #expect(results.first?.item.plainText == expected, "\(query) → \(results.map(\.item.plainText))")
+    }
+
+    @Test func onlyForCJKText() {
+        #expect(PhoneticKey.make("hello world") == nil)
+        #expect(PhoneticKey.make("Đà Nẵng") == nil)
+        #expect(PhoneticKey.make("北京")?.contains("beijing") == true)
+        #expect(PhoneticKey.make("한국") == TextNormalizer.normalize("ㅎㄱ"))
+    }
+
+    @Test func textMatchBeatsReadingMatch() throws {
+        // "bei" khớp thẳng chữ Latin ở mục sau, chỉ khớp theo cách đọc ở mục trước (mới hơn).
+        let mixed = [item("北京", age: 10), item("bei", age: 20)]
+        #expect(SearchEngine().search(mixed, query: "bei", filter: .all).first?.item.plainText == "bei")
+    }
+
+    @Test func highlightsTheMatchedCharacters() {
+        #expect(Highlighter.ranges(of: "beijing", in: "去北京") == [1..<3])
+        #expect(Highlighter.ranges(of: "bj", in: "去北京") == [1..<3])
+        #expect(Highlighter.ranges(of: "jing", in: "去北京") == [2..<3])
+        #expect(Highlighter.ranges(of: "ㅎㄱ", in: "한국어") == [0..<2])
+        #expect(Highlighter.ranges(of: "北京", in: "去北京") == [1..<3])
     }
 }
 

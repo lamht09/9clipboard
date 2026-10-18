@@ -33,8 +33,18 @@ import Testing
         ("Đà Nẵng", "da nang"),
         ("  Nhiều   khoảng\ttrắng\n", "nhieu khoang trang"),
         ("ĐƯỜNG", "duong"),
+        ("Straße", "strasse"),
+        ("Cœur", "coeur"),
+        ("Ærø Łódź", "aero lodz"),
+        ("Ёлка", "елка"),
+        ("ＡＢＣ１２３", "abc123"),
+        ("한국어", "한국어"),
     ])
     func normalizes(input: String, expected: String) {
         #expect(TextNormalizer.normalize(input) == expected)
+    }
+
+    @Test func hiraganaMatchesKatakana() {
+        #expect(TextNormalizer.normalize("ひらがな") == TextNormalizer.normalize("ヒラガナ"))
     }
 }

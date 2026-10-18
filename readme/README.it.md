@@ -43,6 +43,7 @@ La prima volta, macOS ti chiede di consentire **Accessibilità** a 9clipboard. C
 ## Cosa fa
 
 - **Trova tutto in fretta.** Inizia a digitare. Non servono accenti né parole intere: `perche` trova “Perché”.
+- **Trova cinese, giapponese e coreano in base al suono.** Scrivi pinyin, romaji o consonanti iniziali: `beijing` trova “北京”, `tokyo` trova “東京タワー”, `ㅎㄱ` trova “한국”.
 - **Incolla senza formattazione** con ⇧Invio.
 - **Trascina e rilascia.** Trascina una scheda in un documento, una chat, Note o il Finder.
 - **Conserva ciò che riusi.** Fissa le schede nei Pinboard; le schede fissate non vengono mai eliminate.
