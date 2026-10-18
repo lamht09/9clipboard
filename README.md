@@ -68,7 +68,7 @@ On first launch the app asks for **Accessibility** permission so it can send ⌘
 
 System Settings › Privacy & Security › Accessibility › enable **9clipboard** (or **9clipboard Dev** for a local build).
 
-It still works without it: choosing a card copies its content and you press ⌘V yourself. Check the permission status under Settings › Permissions.
+It still works without it: choosing a card copies its content and you press ⌘V yourself, or drag the card straight into the other app. Check the permission status under Settings › Permissions.
 
 ## Panel shortcuts
 
@@ -79,6 +79,7 @@ It still works without it: choosing a card copies its content and you press ⌘V
 | `Enter` / click | Paste |
 | `⇧Enter` | Paste as plain text |
 | `⌘1`…`⌘9` | Quick-paste card 1–9 |
+| drag a card out of the panel | Drop its content where you release it (text field, Notes, Finder…); no Accessibility needed |
 | `Space` | Large preview (when the search field is empty) |
 | `Tab` / `⇧Tab` | Switch filter tab |
 | `⌘P` | Pin to a Pinboard |

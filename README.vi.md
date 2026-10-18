@@ -66,7 +66,7 @@ Lần đầu chạy, app xin quyền **Trợ năng (Accessibility)** để gửi
 
 System Settings › Quyền riêng tư & Bảo mật › Trợ năng › bật **9clipboard** (hoặc **9clipboard Dev** với bản build trên máy).
 
-Không cấp cũng dùng được: chọn thẻ thì nội dung được copy, bạn tự bấm ⌘V. Trạng thái quyền xem ở Cài đặt › Quyền.
+Không cấp cũng dùng được: chọn thẻ thì nội dung được copy, bạn tự bấm ⌘V, hoặc kéo thẻ thả thẳng vào app kia. Trạng thái quyền xem ở Cài đặt › Quyền.
 
 ## Phím tắt trong panel
 
@@ -77,6 +77,7 @@ Không cấp cũng dùng được: chọn thẻ thì nội dung được copy, b
 | `Enter` / click | Dán |
 | `⇧Enter` | Dán dạng text thuần |
 | `⌘1`…`⌘9` | Dán nhanh thẻ thứ 1–9 |
+| kéo thẻ ra khỏi panel | Thả nội dung đúng chỗ nhả chuột (ô nhập, Notes, Finder…); không cần quyền Trợ năng |
 | `Space` | Xem trước cỡ lớn (khi ô tìm trống) |
 | `Tab` / `⇧Tab` | Đổi tab lọc |
 | `⌘P` | Ghim vào Pinboard |
