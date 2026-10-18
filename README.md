@@ -6,7 +6,7 @@
 
 A free, open-source **clipboard manager for Mac** that keeps your **clipboard history** (text, rich text and images) private and offline — a lightweight alternative to Paste and Maccy, built natively in Swift/SwiftUI for macOS (Apple Silicon). Press **⌥V** to open a strip of cards at the bottom of the screen; pick a card and it is pasted straight into the app you are using.
 
-![9clipboard demo: open with ⌥V, search, preview, click to paste, drag a card into another app, pin](assets/demo.gif)
+![9clipboard demo: open with ⌥V, search without accents, drag a card into another app](assets/demo.gif)
 
 ▶ [Full demo video (49s)](assets/demo.mp4)
 
