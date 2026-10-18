@@ -8,9 +8,9 @@
 
 Free, open source and private: your history never leaves your Mac. A lightweight alternative to Paste and Maccy.
 
-![9clipboard demo: open with ⌥V, search, filter, preview, click to paste, drag a card into another app, pin](assets/demo.gif)
+![9clipboard demo: open with ⌥V, search, filter, preview, click to paste, drag a card into another app, pin](assets/demo.webp)
 
-▶ [Watch the full demo (49 seconds)](assets/demo.mp4)
+▶ [Watch the full demo (64 seconds)](assets/demo.mp4)
 
 ## Install
 

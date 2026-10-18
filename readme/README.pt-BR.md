@@ -8,9 +8,9 @@
 
 Gratuito, de código aberto e privado: seu histórico nunca sai do seu Mac. Uma alternativa leve ao Paste e ao Maccy.
 
-![Demonstração do 9clipboard: abrir com ⌥V, buscar, filtrar, pré-visualizar, clicar para colar, arrastar um cartão para outro app, fixar](../assets/demo.gif)
+![Demonstração do 9clipboard: abrir com ⌥V, buscar, filtrar, pré-visualizar, clicar para colar, arrastar um cartão para outro app, fixar](../assets/demo.webp)
 
-▶ [Assista à demonstração completa (49 segundos)](../assets/demo.mp4)
+▶ [Assista à demonstração completa (64 segundos)](../assets/demo.mp4)
 
 ## Instalação
 

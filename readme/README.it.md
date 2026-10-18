@@ -8,9 +8,9 @@
 
 Gratuita, open source e privata: la cronologia non lascia mai il tuo Mac. Un’alternativa leggera a Paste e Maccy.
 
-![Demo di 9clipboard: apri con ⌥V, cerca, filtra, anteprima, fai clic per incollare, trascina una scheda in un’altra app, fissa](../assets/demo.gif)
+![Demo di 9clipboard: apri con ⌥V, cerca, filtra, anteprima, fai clic per incollare, trascina una scheda in un’altra app, fissa](../assets/demo.webp)
 
-▶ [Guarda la demo completa (49 secondi)](../assets/demo.mp4)
+▶ [Guarda la demo completa (64 secondi)](../assets/demo.mp4)
 
 ## Installazione
 

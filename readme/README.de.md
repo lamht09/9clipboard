@@ -8,9 +8,9 @@
 
 Kostenlos, Open Source und privat: Dein Verlauf verlässt nie deinen Mac. Eine schlanke Alternative zu Paste und Maccy.
 
-![9clipboard-Demo: mit ⌥V öffnen, suchen, filtern, Vorschau, zum Einsetzen klicken, Karte in eine andere App ziehen, anheften](../assets/demo.gif)
+![9clipboard-Demo: mit ⌥V öffnen, suchen, filtern, Vorschau, zum Einsetzen klicken, Karte in eine andere App ziehen, anheften](../assets/demo.webp)
 
-▶ [Ganze Demo ansehen (49 Sekunden)](../assets/demo.mp4)
+▶ [Ganze Demo ansehen (64 Sekunden)](../assets/demo.mp4)
 
 ## Installation
 

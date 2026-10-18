@@ -8,9 +8,9 @@
 
 Gratis, de código abierto y privado: tu historial nunca sale de tu Mac. Una alternativa ligera a Paste y Maccy.
 
-![Demo de 9clipboard: abrir con ⌥V, buscar, filtrar, previsualizar, hacer clic para pegar, arrastrar una tarjeta a otra app, fijar](../assets/demo.gif)
+![Demo de 9clipboard: abrir con ⌥V, buscar, filtrar, previsualizar, hacer clic para pegar, arrastrar una tarjeta a otra app, fijar](../assets/demo.webp)
 
-▶ [Ver la demo completa (49 segundos)](../assets/demo.mp4)
+▶ [Ver la demo completa (64 segundos)](../assets/demo.mp4)
 
 ## Instalación
 

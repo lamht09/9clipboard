@@ -8,9 +8,9 @@
 
 免費、開放原始碼、重視隱私：歷史記錄只保存在你的 Mac 上。是 Paste 和 Maccy 的輕量替代方案。
 
-![9clipboard 示範：按下 ⌥V 打開、搜尋、篩選、預覽、按一下貼上、把卡片拖到其他 App、釘選](../assets/demo.gif)
+![9clipboard 示範：按下 ⌥V 打開、搜尋、篩選、預覽、按一下貼上、把卡片拖到其他 App、釘選](../assets/demo.webp)
 
-▶ [觀看完整示範影片（49 秒）](../assets/demo.mp4)
+▶ [觀看完整示範影片（64 秒）](../assets/demo.mp4)
 
 ## 安裝
 

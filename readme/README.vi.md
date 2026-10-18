@@ -8,9 +8,9 @@
 
 Miễn phí, mã nguồn mở và riêng tư: lịch sử chỉ nằm trên máy bạn. Một lựa chọn gọn nhẹ thay cho Paste và Maccy.
 
-![Demo 9clipboard: mở bằng ⌥V, tìm kiếm, lọc, xem trước, click để dán, kéo thẻ sang app khác, ghim](../assets/demo.gif)
+![Demo 9clipboard: mở bằng ⌥V, tìm kiếm, lọc, xem trước, click để dán, kéo thẻ sang app khác, ghim](../assets/demo.webp)
 
-▶ [Xem video demo đầy đủ (49 giây)](../assets/demo.mp4)
+▶ [Xem video demo đầy đủ (64 giây)](../assets/demo.mp4)
 
 ## Cài đặt
 
