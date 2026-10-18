@@ -6,6 +6,7 @@ import AppKit
 /// (`CFBundleDevelopmentRegion`). Đổi ngôn ngữ cần khởi động lại app.
 enum AppLanguage: String, CaseIterable, Identifiable {
     case system, en, vi
+    case zhHans = "zh-Hans", zhHant = "zh-Hant", ja, ko, es, fr, de, ptBR = "pt-BR", ru, it
 
     var id: String { rawValue }
 
@@ -15,6 +16,16 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         case .system: String(localized: "System Default")
         case .en: "English"
         case .vi: "Tiếng Việt"
+        case .zhHans: "简体中文"
+        case .zhHant: "繁體中文"
+        case .ja: "日本語"
+        case .ko: "한국어"
+        case .es: "Español"
+        case .fr: "Français"
+        case .de: "Deutsch"
+        case .ptBR: "Português (Brasil)"
+        case .ru: "Русский"
+        case .it: "Italiano"
         }
     }
 
@@ -26,7 +37,13 @@ enum AppLanguage: String, CaseIterable, Identifiable {
         guard let languages = UserDefaults.standard.persistentDomain(forName: domain)?[key] as? [String],
               let first = languages.first
         else { return .system }
-        return AppLanguage(rawValue: Locale(identifier: first).language.languageCode?.identifier ?? "") ?? .system
+        if let exact = AppLanguage(rawValue: first) { return exact }
+        // System Settings có thể ghi kèm vùng ("zh-Hans-VN", "pt-PT"): lấy bản dịch gần nhất cùng ngôn ngữ.
+        let codes = allCases.filter { $0 != .system }.map(\.rawValue)
+        guard let match = Bundle.preferredLocalizations(from: codes, forPreferences: [first]).first,
+              Locale(identifier: match).language.languageCode == Locale(identifier: first).language.languageCode
+        else { return .system }
+        return AppLanguage(rawValue: match) ?? .system
     }
 
     static func save(_ language: AppLanguage) {
