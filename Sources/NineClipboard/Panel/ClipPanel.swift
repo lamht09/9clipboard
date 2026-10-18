@@ -6,6 +6,8 @@ final class ClipPanel: NSPanel {
     var keyHandler: ((NSEvent) -> Bool)?
     /// Nhận mọi sự kiện cuộn (con lăn, trackpad) trong panel.
     var scrollHandler: ((NSEvent) -> Void)?
+    /// Thấy chuột trái trước SwiftUI; trả về true để giữ lại sự kiện (dùng cho kéo thẻ ra ngoài).
+    var mouseHandler: ((NSEvent) -> Bool)?
 
     init() {
         super.init(
@@ -30,6 +32,7 @@ final class ClipPanel: NSPanel {
 
     override func sendEvent(_ event: NSEvent) {
         if event.type == .keyDown, keyHandler?(event) == true { return }
+        if [.leftMouseDown, .leftMouseDragged, .leftMouseUp].contains(event.type), mouseHandler?(event) == true { return }
         if event.type == .scrollWheel, let scrollHandler {
             scrollHandler(event)
             return

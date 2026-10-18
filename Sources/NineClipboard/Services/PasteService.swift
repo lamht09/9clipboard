@@ -9,21 +9,28 @@ enum PasteService {
     static func write(_ item: ClipItem, representations: [Representation], blobLoader: (String) -> Data? = { _ in nil }, plainOnly: Bool) {
         let pb = NSPasteboard.general
         pb.clearContents()
+        let entry = pasteboardItem(item, representations: representations, blobLoader: blobLoader, plainOnly: plainOnly)
+        entry.setData(Data(), forType: NSPasteboard.PasteboardType(UTI.selfMarker))
+        pb.writeObjects([entry])
+    }
 
+    /// Mọi định dạng của item trong một `NSPasteboardItem`, dùng cho cả dán lẫn kéo-thả.
+    static func pasteboardItem(_ item: ClipItem, representations: [Representation], blobLoader: (String) -> Data? = { _ in nil }, plainOnly: Bool = false) -> NSPasteboardItem {
+        let entry = NSPasteboardItem()
         if plainOnly, let text = item.plainText {
-            pb.setString(text, forType: .string)
+            entry.setString(text, forType: .string)
         } else {
             for rep in representations {
                 let data = rep.data ?? rep.blobPath.flatMap(blobLoader)
                 if let data {
-                    pb.setData(data, forType: NSPasteboard.PasteboardType(rep.uti))
+                    entry.setData(data, forType: NSPasteboard.PasteboardType(rep.uti))
                 }
             }
             if representations.isEmpty, let text = item.plainText {
-                pb.setString(text, forType: .string)
+                entry.setString(text, forType: .string)
             }
         }
-        pb.setData(Data(), forType: NSPasteboard.PasteboardType(UTI.selfMarker))
+        return entry
     }
 
     /// Gửi ⌘V tới app đang frontmost sau `delay`. Cần quyền Accessibility.

@@ -15,6 +15,8 @@ struct CardView: View {
     var pinboard: Pinboard?
     /// Có thì thẻ đang chọn hiện các nút thao tác ở đầu thẻ.
     var viewModel: PanelViewModel?
+    /// Nền đặc thay cho kính mờ, để `ImageRenderer` vẽ được (ảnh kéo-thả).
+    var opaque = false
 
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -26,7 +28,13 @@ struct CardView: View {
             footer
         }
         .frame(width: Self.size, height: Self.size)
-        .background(VisualEffectBackground(cornerRadius: 10))
+        .background {
+            if opaque {
+                Color(nsColor: .windowBackgroundColor)
+            } else {
+                VisualEffectBackground(cornerRadius: 10)
+            }
+        }
         .background(Color(nsColor: .textBackgroundColor).opacity(isSelected ? 0.6 : 0.35))
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: .black.opacity(0.25), radius: 5, y: 2)

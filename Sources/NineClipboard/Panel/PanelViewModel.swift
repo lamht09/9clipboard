@@ -62,6 +62,8 @@ final class PanelViewModel {
     var viewportWidth: CGFloat = 0
     @ObservationIgnored private var dragStartOffset: CGFloat?
     @ObservationIgnored private var lastDragEnd = Date.distantPast
+    /// Thẻ đã được kéo ra khỏi panel: cử chỉ cuộn / sắp xếp đang dở bị huỷ, chỉ chờ nó kết thúc.
+    @ObservationIgnored private var draggingOut = false
 
     /// Callback khi người dùng chọn dán.
     var onPick: ((ClipItem, _ plainOnly: Bool) -> Void)?
@@ -115,6 +117,7 @@ final class PanelViewModel {
         query = ""
         filter = .all
         boardEditor = nil
+        draggingOut = false
         resetPosition()
         focusToken += 1
     }
@@ -249,6 +252,7 @@ final class PanelViewModel {
 
     /// `location` tính trong toạ độ `PanelLayout.space`, để so với khung các tab.
     func reorderChanged(index: Int, translation: CGSize, location: CGPoint) {
+        guard !draggingOut else { return }
         if reorderIndex == nil {
             reorderIndex = index
             selectedIndex = index
@@ -267,6 +271,11 @@ final class PanelViewModel {
     func reorderEnded() {
         lastDragEnd = Date()
         defer { dropTarget = nil }
+        if draggingOut {
+            draggingOut = false
+            resetReorder()
+            return
+        }
         guard let from = reorderIndex, items.indices.contains(from) else {
             reorderIndex = nil
             return
@@ -293,6 +302,17 @@ final class PanelViewModel {
             // Giữ độ lệch tới khi thứ tự mới đã nạp xong, để thẻ không nhảy về chỗ cũ trong chốc lát.
             resetReorder()
             selectedIndex = to
+        }
+    }
+
+    /// Thẻ vừa ra khỏi panel thành kéo-thả hệ thống: trả dải thẻ về như lúc nhấn chuột.
+    func beginDragOut() {
+        draggingOut = true
+        dropTarget = nil
+        if let start = dragStartOffset { scrollOffset = start }
+        withAnimation(.easeOut(duration: 0.15)) {
+            reorderTranslation = 0
+            reorderLift = 0
         }
     }
 
@@ -346,6 +366,7 @@ final class PanelViewModel {
     }
 
     func dragChanged(translation: CGFloat) {
+        guard !draggingOut else { return }
         let start = dragStartOffset ?? scrollOffset
         dragStartOffset = start
         scrollOffset = clamped(start - translation)
@@ -356,6 +377,10 @@ final class PanelViewModel {
         let start = dragStartOffset ?? scrollOffset
         dragStartOffset = nil
         lastDragEnd = Date()
+        if draggingOut {
+            draggingOut = false
+            return
+        }
         withAnimation(.easeOut(duration: 0.35)) {
             scrollOffset = clamped(start - predictedTranslation)
         }

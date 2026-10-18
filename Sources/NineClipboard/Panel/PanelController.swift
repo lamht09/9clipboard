@@ -12,6 +12,7 @@ final class PanelController: NSObject, NSWindowDelegate {
     private let panel = ClipPanel()
     private let previewPanel = PreviewPanel()
     private let previewLoader: LargePreviewLoader
+    private let dragOut: CardDragOut
     static let previewSize = NSSize(width: 680, height: 420)
     let viewModel: PanelViewModel
     private let model: AppModel
@@ -21,6 +22,7 @@ final class PanelController: NSObject, NSWindowDelegate {
         self.model = model
         viewModel = PanelViewModel(model: model)
         previewLoader = LargePreviewLoader(store: model.store)
+        dragOut = CardDragOut(model: model, viewModel: viewModel)
         super.init()
 
         let preview = NSHostingView(rootView: LargePreviewView(viewModel: viewModel, loader: previewLoader))
@@ -39,6 +41,42 @@ final class PanelController: NSObject, NSWindowDelegate {
         panel.keyHandler = { [weak self] event in self?.handleKey(event) ?? false }
         panel.scrollHandler = { [weak self] event in self?.viewModel.scroll(with: event) }
         viewModel.onPick = { [weak self] item, plainOnly in self?.paste(item, plainOnly: plainOnly) }
+        panel.mouseHandler = { [weak self, hosting] event in self?.dragOut.handle(event, in: hosting) ?? false }
+        dragOut.onBegin = { [weak self] in self?.dragOutBegan() }
+        dragOut.onEnd = { [weak self] item, dropped in self?.dragOutEnded(item, dropped: dropped) }
+    }
+
+    // MARK: - Kéo thẻ ra app khác
+
+    /// Ẩn panel (không đóng) để không che chỗ thả; huỷ kéo thì hiện lại.
+    private func dragOutBegan() {
+        closePreview()
+        panel.ignoresMouseEvents = true
+        NSAnimationContext.runAnimationGroup { ctx in
+            ctx.duration = 0.12
+            panel.animator().alphaValue = 0
+        }
+    }
+
+    private func dragOutEnded(_ item: ClipItem, dropped: Bool) {
+        // Phiên kéo-thả nuốt mất mouseUp: gửi bù để cử chỉ SwiftUI đang dở kết thúc.
+        if let up = NSEvent.mouseEvent(
+            with: .leftMouseUp, location: panel.mouseLocationOutsideOfEventStream, modifierFlags: [],
+            timestamp: ProcessInfo.processInfo.systemUptime, windowNumber: panel.windowNumber,
+            context: nil, eventNumber: 0, clickCount: 1, pressure: 0) {
+            panel.sendEvent(up)
+        }
+        panel.ignoresMouseEvents = false
+        guard dropped else {
+            if isShown { panel.alphaValue = 1 }
+            return
+        }
+        hide(animated: false)
+        guard let id = item.id else { return }
+        Task {
+            try? await model.store.markUsed(id: id)
+            await model.reload()
+        }
     }
 
     /// Ghi item lên pasteboard, đóng panel rồi gửi ⌘V.
@@ -86,6 +124,7 @@ final class PanelController: NSObject, NSWindowDelegate {
 
         panel.setFrame(start, display: false)
         panel.alphaValue = 0
+        panel.ignoresMouseEvents = false
         panel.makeKeyAndOrderFront(nil)
         NSAnimationContext.runAnimationGroup { ctx in
             ctx.duration = 0.18
