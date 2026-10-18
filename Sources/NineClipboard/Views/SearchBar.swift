@@ -2,18 +2,16 @@ import ClipCore
 import SwiftUI
 
 /// Ô tìm kiếm luôn giữ focus khi panel mở, nên gõ ở đâu cũng vào đây.
-/// Dùng TextField thật (không tự bắt phím) để bộ gõ tiếng Việt của hệ thống vẫn hoạt động.
+/// Dùng ô nhập thật (không tự bắt phím) để bộ gõ của hệ thống (Telex, pinyin, kana…) vẫn hoạt động.
 struct SearchBar: View {
     @Bindable var viewModel: PanelViewModel
-    @FocusState private var focused: Bool
 
     var body: some View {
         HStack(spacing: 6) {
             Image(systemName: "magnifyingglass")
                 .foregroundStyle(.secondary)
-            TextField("Search…", text: $viewModel.query)
-                .textFieldStyle(.plain)
-                .focused($focused)
+            SearchField(text: $viewModel.query, placeholder: String(localized: "Search…"),
+                        focusToken: viewModel.focusToken)
             if !viewModel.query.isEmpty {
                 Image(systemName: "xmark.circle.fill")
                     .foregroundStyle(.tertiary)
@@ -26,8 +24,6 @@ struct SearchBar: View {
         .background(VisualEffectBackground(cornerRadius: PanelLayout.barHeight / 2))
         .clipShape(Capsule())
         .shadow(color: .black.opacity(0.2), radius: 4, y: 1)
-        .onAppear { focused = true }
-        .onChange(of: viewModel.focusToken) { focused = true }
     }
 }
 
