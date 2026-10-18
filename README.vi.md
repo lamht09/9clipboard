@@ -4,7 +4,7 @@
 
 [![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-black) ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lưu **lịch sử copy/paste** (text, rich text, ảnh) ngay trên máy, không cần mạng — giải pháp nhẹ thay cho Paste và Maccy, viết native bằng Swift/SwiftUI cho macOS (Apple Silicon), hỗ trợ tìm kiếm tiếng Việt không dấu. Bấm **⌥V** để mở dải thẻ ở đáy màn hình, chọn một thẻ là dán luôn vào app đang dùng.
+Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lưu **lịch sử copy/paste** (text, rich text, ảnh) ngay trên máy, không gửi dữ liệu đi đâu — giải pháp nhẹ thay cho Paste và Maccy, viết native bằng Swift/SwiftUI cho macOS (Apple Silicon), hỗ trợ tìm kiếm tiếng Việt không dấu. Bấm **⌥V** để mở dải thẻ ở đáy màn hình, chọn một thẻ là dán luôn vào app đang dùng.
 
 ![Demo 9clipboard: mở bằng ⌥V, tìm không dấu, lọc, xem trước, click để dán, kéo thẻ sang app khác, ghim](assets/demo.gif)
 
@@ -14,7 +14,8 @@ Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lư
 - Ghim vào các Pinboard, mục đã ghim không bị xoá
 - Mật khẩu (từ 1Password, Passwords…) tự xoá sau 15 phút; loại trừ app, tạm dừng ghi
 - Giao diện tiếng Anh và tiếng Việt (theo ngôn ngữ của máy, đổi trong Cài đặt › Chung)
-- Dữ liệu chỉ nằm trên máy, không có network
+- Tự cập nhật trong Cài đặt › Cập nhật (tự kiểm tra hoặc kiểm tra thủ công, bấm một nút để cài hoặc để app tự cài)
+- Dữ liệu chỉ nằm trên máy — kết nối mạng duy nhất là kiểm tra cập nhật: hỏi GitHub số phiên bản mới nhất, tắt được
 
 ## Yêu cầu
 
@@ -31,7 +32,7 @@ Dán lệnh này vào Terminal:
 curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
 ```
 
-Lệnh này tải bản mới nhất, kiểm tra app được ký bằng chứng chỉ release của 9clipboard, cài vào `/Applications` rồi mở app. File tải bằng `curl` không bị macOS gắn cờ nên **không có hộp thoại Gatekeeper**. Chạy lại đúng lệnh này để cập nhật. Sau đó cấp quyền Trợ năng khi được hỏi (để dán bằng ⌘V).
+Lệnh này tải bản mới nhất, kiểm tra app được ký bằng chứng chỉ release của 9clipboard, cài vào `/Applications` rồi mở app. File tải bằng `curl` không bị macOS gắn cờ nên **không có hộp thoại Gatekeeper**. Các bản sau cài được ngay trong Cài đặt › Cập nhật (hoặc chạy lại đúng lệnh này). Sau đó cấp quyền Trợ năng khi được hỏi (để dán bằng ⌘V).
 
 ### Cài thủ công
 

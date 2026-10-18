@@ -9,6 +9,7 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
     private var statusItemController: StatusItemController?
     private var panelController: PanelController?
     private var settingsController: SettingsWindowController?
+    private var updater: Updater?
 
     func applicationDidFinishLaunching(_ notification: Notification) {
         Preferences.registerDefaults()
@@ -29,7 +30,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         self.panelController = panelController
         let privacy = PrivacyController()
         self.privacy = privacy
-        let settingsController = SettingsWindowController(model: SettingsModel(app: model, dataDirectory: dir))
+        let updater = Updater()
+        updater.isPanelShown = { panelController.isShown }
+        self.updater = updater
+        let settingsController = SettingsWindowController(
+            model: SettingsModel(app: model, dataDirectory: dir, updater: updater))
         self.settingsController = settingsController
         let statusItemController = StatusItemController(
             privacy: privacy,
@@ -59,5 +64,6 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         model.startExpiryTimer()
         Task { await model.purgeExpired() }
         PermissionService.showOnboardingIfNeeded()
+        updater.start()
     }
 }

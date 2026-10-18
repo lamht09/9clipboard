@@ -52,18 +52,8 @@ enum AppLanguage: String, CaseIterable, Identifiable {
     /// Bản dịch app đang chạy.
     static var running: String? { Bundle.main.preferredLocalizations.first }
 
-    /// Mở lại app sau khi tiến trình hiện tại thoát hẳn.
     @MainActor
     static func relaunch() {
-        let script = "while kill -0 \(ProcessInfo.processInfo.processIdentifier) 2>/dev/null; do sleep 0.1; done; open \"$0\""
-        let task = Process()
-        task.executableURL = URL(fileURLWithPath: "/bin/sh")
-        task.arguments = ["-c", script, Bundle.main.bundlePath]
-        do {
-            try task.run()
-            NSApp.terminate(nil)
-        } catch {
-            log.error("Không khởi động lại được: \(error.localizedDescription)")
-        }
+        NSApp.relaunch()
     }
 }

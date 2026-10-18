@@ -14,7 +14,8 @@ A free, open-source **clipboard manager for Mac** that keeps your **clipboard hi
 - Pin items to Pinboards; pinned items are never deleted
 - Passwords (from 1Password, Passwords…) are removed after 15 minutes; exclude apps, pause recording
 - English and Vietnamese interface (follows your Mac’s language; change it in Settings › General)
-- All data stays on your Mac — no network access
+- Updates itself from Settings › Updates (check automatically or by hand, install with one click or automatically)
+- All data stays on your Mac — the only network request is the update check, which asks GitHub for the latest version number and can be turned off
 
 ## Requirements
 
@@ -31,7 +32,7 @@ Paste this into Terminal:
 curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
 ```
 
-It downloads the latest release, checks that it is signed with the 9clipboard release certificate, installs it to `/Applications` and opens it. Files downloaded by `curl` are not flagged by macOS, so there is **no Gatekeeper prompt**. Run the same command again to update. Then grant Accessibility access when asked (needed to paste with ⌘V).
+It downloads the latest release, checks that it is signed with the 9clipboard release certificate, installs it to `/Applications` and opens it. Files downloaded by `curl` are not flagged by macOS, so there is **no Gatekeeper prompt**. Later versions can be installed from Settings › Updates (or by running the same command again). Then grant Accessibility access when asked (needed to paste with ⌘V).
 
 ### Manual install
 

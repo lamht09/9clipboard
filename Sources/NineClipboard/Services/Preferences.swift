@@ -12,6 +12,9 @@ enum Preferences {
             Key.detectPasswords: true,
             Key.passwordLifetimeMinutes: 15,
             Key.maxImageMB: 20,
+            Key.autoCheckUpdates: true,
+            Key.autoInstallUpdates: false,
+            Key.includeBetaUpdates: false,
         ])
     }
 
@@ -24,6 +27,10 @@ enum Preferences {
         static let pausedUntil = "pausedUntil"
         static let maxImageMB = "maxImageMB"
         static let hotkey = "hotkey"
+        static let autoCheckUpdates = "autoCheckUpdates"
+        static let autoInstallUpdates = "autoInstallUpdates"
+        static let lastUpdateCheck = "lastUpdateCheck"
+        static let includeBetaUpdates = "includeBetaUpdates"
     }
 
     /// Phím tắt mở panel (mặc định ⌥V).
@@ -70,5 +77,28 @@ enum Preferences {
     static var pausedUntil: Date? {
         get { defaults.object(forKey: Key.pausedUntil) as? Date }
         set { defaults.set(newValue, forKey: Key.pausedUntil) }
+    }
+
+    /// Tự hỏi GitHub phiên bản mới nhất (mỗi ngày và khi mở Settings). Tắt thì chỉ kiểm tra khi bấm nút.
+    static var autoCheckUpdates: Bool {
+        get { defaults.bool(forKey: Key.autoCheckUpdates) }
+        set { defaults.set(newValue, forKey: Key.autoCheckUpdates) }
+    }
+
+    /// Có bản mới thì tự tải, cài và khởi động lại (khi panel đang đóng). Cần bật `autoCheckUpdates`.
+    static var autoInstallUpdates: Bool {
+        get { defaults.bool(forKey: Key.autoInstallUpdates) }
+        set { defaults.set(newValue, forKey: Key.autoInstallUpdates) }
+    }
+
+    /// Nhận cả bản beta (tag có hậu tố như `-beta.1`, đánh dấu pre-release trên GitHub).
+    static var includeBetaUpdates: Bool {
+        get { defaults.bool(forKey: Key.includeBetaUpdates) }
+        set { defaults.set(newValue, forKey: Key.includeBetaUpdates) }
+    }
+
+    static var lastUpdateCheck: Date? {
+        get { defaults.object(forKey: Key.lastUpdateCheck) as? Date }
+        set { defaults.set(newValue, forKey: Key.lastUpdateCheck) }
     }
 }

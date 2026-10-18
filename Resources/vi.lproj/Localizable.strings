@@ -137,9 +137,36 @@
 "Accessibility Access Not Granted" = "Chưa cấp quyền Trợ năng";
 "9clipboard pastes by sending ⌘V to the active app." = "9clipboard tự dán bằng cách gửi ⌘V vào app đang dùng.";
 "Without access, 9clipboard only copies and you press ⌘V to paste." = "Không có quyền thì 9clipboard chỉ copy, bạn tự bấm ⌘V để dán.";
-"This access is only used to send ⌘V. 9clipboard needs no network and never sends your data anywhere." = "Quyền này chỉ dùng để gửi phím ⌘V. 9clipboard không cần mạng và không gửi dữ liệu đi đâu.";
+"This access is only used to send ⌘V. 9clipboard never sends your clipboard anywhere." = "Quyền này chỉ dùng để gửi phím ⌘V. 9clipboard không bao giờ gửi nội dung clipboard đi đâu.";
 "Version %@" = "Phiên bản %@";
 "Developed by %@" = "Phát triển bởi %@";
+
+/* Cập nhật */
+"Updates" = "Cập nhật";
+"Current Version" = "Phiên bản hiện tại";
+"Last checked %@" = "Kiểm tra lần cuối %@";
+"Check Now" = "Kiểm tra ngay";
+"Updates are turned off in development builds." = "Bản dev không tự cập nhật.";
+"Check for Updates Automatically" = "Tự động kiểm tra cập nhật";
+"Once a day and when you open Settings, 9clipboard asks GitHub for the latest version number. Nothing about you or your clipboard is sent. When off, it only checks when you click “Check Now”." = "Mỗi ngày một lần và khi bạn mở Cài đặt, 9clipboard hỏi GitHub số phiên bản mới nhất. Không gửi gì về bạn hay clipboard. Tắt thì chỉ kiểm tra khi bạn bấm “Kiểm tra ngay”.";
+"Install Updates Automatically" = "Tự động cài cập nhật";
+"Downloads the new version and restarts 9clipboard while the panel is closed. Your history, settings and Accessibility access are kept." = "Tự tải bản mới và khởi động lại 9clipboard lúc panel đang đóng. Lịch sử, cài đặt và quyền Trợ năng vẫn được giữ nguyên.";
+"Version %@ is available" = "Đã có phiên bản %@";
+"Include Beta Versions" = "Nhận cả bản beta";
+"Get new features earlier. Betas may have bugs." = "Có tính năng mới sớm hơn. Bản beta có thể còn lỗi.";
+"What’s New" = "Có gì mới";
+"Downloading…" = "Đang tải…";
+"Installing…" = "Đang cài…";
+"Checking for updates…" = "Đang kiểm tra cập nhật…";
+"Update Now" = "Cập nhật ngay";
+"9clipboard is up to date" = "9clipboard đang là bản mới nhất";
+"The download failed (HTTP %lld)." = "Tải về thất bại (HTTP %lld).";
+"The downloaded file isn’t a valid 9clipboard archive." = "File tải về không phải gói 9clipboard hợp lệ.";
+"The download doesn’t contain the expected version of 9clipboard." = "File tải về không chứa đúng phiên bản 9clipboard cần cài.";
+"The downloaded app isn’t signed with the 9clipboard certificate, so it wasn’t installed." = "App tải về không được ký bằng chứng chỉ của 9clipboard nên không được cài.";
+"Couldn’t check for updates: %@" = "Không kiểm tra được cập nhật: %@";
+"Couldn’t install the update: %@" = "Không cài được bản cập nhật: %@";
+"9clipboard couldn’t replace itself in %@ (%@). Download the update from GitHub instead." = "9clipboard không tự thay được trong %1$@ (%2$@). Hãy tải bản cập nhật từ GitHub.";
 
 /* Phím tắt hay bị trùng (HotkeyManager.knownConflict) */
 "Copy" = "Copy";

@@ -9,10 +9,12 @@ import ServiceManagement
 final class SettingsModel {
     let app: AppModel
     let dataDirectory: URL
+    let updater: Updater
 
-    init(app: AppModel, dataDirectory: URL) {
+    init(app: AppModel, dataDirectory: URL, updater: Updater) {
         self.app = app
         self.dataDirectory = dataDirectory
+        self.updater = updater
         refresh()
     }
 
@@ -270,6 +272,25 @@ final class SettingsModel {
 
     func createPinboard() {
         Task { await app.createPinboard(name: String(localized: "New Board")) }
+    }
+
+    // MARK: - Cập nhật
+
+    var autoCheckUpdates = Preferences.autoCheckUpdates {
+        didSet {
+            Preferences.autoCheckUpdates = autoCheckUpdates
+            if autoCheckUpdates { updater.settingsOpened() }
+        }
+    }
+    var autoInstallUpdates = Preferences.autoInstallUpdates {
+        didSet { Preferences.autoInstallUpdates = autoInstallUpdates }
+    }
+    var includeBetaUpdates = Preferences.includeBetaUpdates {
+        didSet {
+            guard includeBetaUpdates != oldValue else { return }
+            Preferences.includeBetaUpdates = includeBetaUpdates
+            updater.channelChanged()
+        }
     }
 
     // MARK: - Quyền

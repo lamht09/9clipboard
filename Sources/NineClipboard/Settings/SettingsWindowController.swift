@@ -15,6 +15,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
         let window = window ?? makeWindow()
         self.window = window
         model.refresh()
+        model.updater.settingsOpened()
         NSApp.bringToFront()
         window.makeKeyAndOrderFront(nil)
         // Phòng khi app chưa kịp thành active: vẫn đưa cửa sổ lên trên cùng.
@@ -34,6 +35,7 @@ final class SettingsWindowController: NSObject, NSWindowDelegate {
     // Quay về từ System Settings (cấp quyền, mục đăng nhập) → đọc lại trạng thái.
     func windowDidBecomeKey(_ notification: Notification) {
         model.refresh()
+        model.updater.settingsOpened()
     }
 
     func windowWillClose(_ notification: Notification) {

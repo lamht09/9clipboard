@@ -1,7 +1,7 @@
 import ClipCore
 import SwiftUI
 
-/// Cửa sổ Settings 4 tab + tab Giới thiệu.
+/// Cửa sổ Settings 5 tab + tab Giới thiệu.
 struct SettingsView: View {
     var model: SettingsModel
 
@@ -15,6 +15,8 @@ struct SettingsView: View {
                 .tabItem { Label("Pinboard", systemImage: "pin") }
             PermissionTab(model: model)
                 .tabItem { Label("Permissions", systemImage: "lock.shield") }
+            UpdatesTab(model: model)
+                .tabItem { Label("Updates", systemImage: "arrow.down.circle") }
             AboutTab()
                 .tabItem { Label("About", systemImage: "info.circle") }
         }
@@ -274,10 +276,98 @@ private struct PermissionTab: View {
                     Button("Open System Settings") { model.openAccessibilitySettings() }
                 }
             } footer: {
-                Caption("This access is only used to send ⌘V. 9clipboard needs no network and never sends your data anywhere.")
+                Caption("This access is only used to send ⌘V. 9clipboard never sends your clipboard anywhere.")
             }
         }
         .formStyle(.grouped)
+    }
+}
+
+// MARK: - Cập nhật
+
+private struct UpdatesTab: View {
+    @Bindable var model: SettingsModel
+    private var updater: Updater { model.updater }
+
+    var body: some View {
+        Form {
+            Section {
+                LabeledContent("Current Version") { Text(About.version).textSelection(.enabled) }
+                if updater.isSupported {
+                    status
+                    if case .failed(let message) = updater.phase {
+                        Caption(message)
+                    }
+                    HStack {
+                        if let lastChecked = updater.lastChecked {
+                            Caption("Last checked \(lastChecked.formatted(.relative(presentation: .named)))")
+                        }
+                        Spacer()
+                        Button("Check Now") { updater.checkNow() }
+                            .disabled(updater.isBusy)
+                    }
+                } else {
+                    Caption("Updates are turned off in development builds.")
+                }
+            }
+
+            Section {
+                Toggle(isOn: $model.autoCheckUpdates) {
+                    Text("Check for Updates Automatically")
+                    Text("Once a day and when you open Settings, 9clipboard asks GitHub for the latest version number. Nothing about you or your clipboard is sent. When off, it only checks when you click “Check Now”.")
+                }
+                Toggle(isOn: $model.autoInstallUpdates) {
+                    Text("Install Updates Automatically")
+                    Text("Downloads the new version and restarts 9clipboard while the panel is closed. Your history, settings and Accessibility access are kept.")
+                }
+                .disabled(!model.autoCheckUpdates)
+                Toggle(isOn: $model.includeBetaUpdates) {
+                    Text("Include Beta Versions")
+                    Text("Get new features earlier. Betas may have bugs.")
+                }
+            }
+            .disabled(!updater.isSupported)
+        }
+        .formStyle(.grouped)
+    }
+
+    @ViewBuilder private var status: some View {
+        if let update = updater.update {
+            HStack(spacing: 10) {
+                Image(systemName: "arrow.down.circle.fill").font(.title2).foregroundStyle(.blue)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Version \(update.version.description) is available").font(.headline)
+                    if let notes = update.releaseNotesURL {
+                        Link("What’s New", destination: notes).font(.caption)
+                    }
+                }
+                Spacer()
+                switch updater.phase {
+                case .downloading: Progress(label: "Downloading…")
+                case .installing: Progress(label: "Installing…")
+                default:
+                    Button("Update Now") { updater.installNow() }
+                        .disabled(updater.isBusy)
+                }
+            }
+        } else if updater.phase == .checking {
+            Progress(label: "Checking for updates…")
+        } else if updater.hasResult {
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill").foregroundStyle(.green)
+                Text("9clipboard is up to date")
+            }
+        }
+    }
+
+    private struct Progress: View {
+        var label: LocalizedStringKey
+        var body: some View {
+            HStack(spacing: 6) {
+                ProgressView().controlSize(.small)
+                Text(label).foregroundStyle(.secondary)
+            }
+        }
     }
 }
 
