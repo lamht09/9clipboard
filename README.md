@@ -8,6 +8,8 @@ A free, open-source **clipboard manager for Mac** that keeps your **clipboard hi
 
 ![9clipboard demo: open with ⌥V, search, preview, click to paste, drag a card into another app, pin](assets/demo.gif)
 
+▶ [Full demo video (49s)](assets/demo.mp4)
+
 - Keeps text, rich text and images; fuzzy, accent-insensitive search (typing `da nang` finds “Đà Nẵng”)
 - Pin items to Pinboards; pinned items are never deleted
 - Passwords (from 1Password, Passwords…) are removed after 15 minutes; exclude apps, pause recording

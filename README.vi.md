@@ -8,6 +8,8 @@ Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lư
 
 ![Demo 9clipboard: mở bằng ⌥V, tìm kiếm, xem trước, click để dán, kéo thẻ sang app khác, ghim](assets/demo.gif)
 
+▶ [Xem video demo đầy đủ (49 giây)](assets/demo.mp4)
+
 - Lưu text, rich text và ảnh; tìm fuzzy không dấu tiếng Việt (`da nang` → “Đà Nẵng”)
 - Ghim vào các Pinboard, mục đã ghim không bị xoá
 - Mật khẩu (từ 1Password, Passwords…) tự xoá sau 15 phút; loại trừ app, tạm dừng ghi
