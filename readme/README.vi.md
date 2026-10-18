@@ -1,102 +1,96 @@
 # 9clipboard
 
-[English](README.md) · **Tiếng Việt**
+[English](../README.md) · **Tiếng Việt** · [简体中文](README.zh-Hans.md) · [繁體中文](README.zh-Hant.md) · [日本語](README.ja.md) · [한국어](README.ko.md) · [Español](README.es.md) · [Français](README.fr.md) · [Deutsch](README.de.md) · [Português](README.pt-BR.md) · [Русский](README.ru.md) · [Italiano](README.it.md)
 
-[![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-black) ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](../LICENSE)
 
-Phần mềm **quản lý clipboard cho Mac** miễn phí, mã nguồn mở: lưu **lịch sử copy/paste** (text, rich text, ảnh) ngay trên máy, không gửi dữ liệu đi đâu — giải pháp nhẹ thay cho Paste và Maccy, viết native bằng Swift/SwiftUI cho macOS (Apple Silicon), hỗ trợ tìm kiếm tiếng Việt không dấu. Bấm **⌥V** để mở dải thẻ ở đáy màn hình, chọn một thẻ là dán luôn vào app đang dùng.
+**Lịch sử clipboard cho Mac.** Cứ copy như bình thường, rồi bấm **⌥V** (Option‑V) để lấy lại bất cứ thứ gì đã copy trước đó — text, text có định dạng hay ảnh — và dán thẳng vào app đang dùng.
 
-![Demo 9clipboard: mở bằng ⌥V, tìm không dấu, lọc, xem trước, click để dán, kéo thẻ sang app khác, ghim](assets/demo.gif)
+Miễn phí, mã nguồn mở và riêng tư: lịch sử chỉ nằm trên máy bạn. Một lựa chọn gọn nhẹ thay cho Paste và Maccy.
 
-▶ [Xem video demo đầy đủ (49 giây)](assets/demo.mp4)
+![Demo 9clipboard: mở bằng ⌥V, tìm kiếm, lọc, xem trước, click để dán, kéo thẻ sang app khác, ghim](../assets/demo.gif)
 
-- Lưu text, rich text và ảnh; tìm fuzzy không dấu tiếng Việt (`da nang` → “Đà Nẵng”)
-- Ghim vào các Pinboard, mục đã ghim không bị xoá
-- Mật khẩu (từ 1Password, Passwords…) tự xoá sau 15 phút; loại trừ app, tạm dừng ghi
-- Giao diện tiếng Anh và tiếng Việt (theo ngôn ngữ của máy, đổi trong Cài đặt › Chung)
-- Tự cập nhật trong Cài đặt › Cập nhật (tự kiểm tra hoặc kiểm tra thủ công, bấm một nút để cài hoặc để app tự cài)
-- Dữ liệu chỉ nằm trên máy — kết nối mạng duy nhất là kiểm tra cập nhật: hỏi GitHub số phiên bản mới nhất, tắt được
+▶ [Xem video demo đầy đủ (49 giây)](../assets/demo.mp4)
 
-## Yêu cầu
+## Cài đặt
 
-- macOS 14 trở lên, Apple Silicon (mọi máy Apple Silicon, kể cả M1, đều cập nhật được lên macOS 14)
-- Để build từ mã nguồn: Swift 6 (Command Line Tools là đủ, không cần Xcode): `xcode-select --install`
+Cần máy Mac chip Apple Silicon (M1 trở lên) chạy macOS 14 Sonoma trở lên.
 
-## Cài bản phát hành
-
-### Cài nhanh (khuyên dùng)
-
-Dán lệnh này vào Terminal:
+Mở **Terminal** (bấm ⌘Space, gõ “Terminal”, Enter), dán dòng này rồi bấm Enter:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
 ```
 
-Lệnh này tải bản mới nhất, kiểm tra app được ký bằng chứng chỉ release của 9clipboard, cài vào `/Applications` rồi mở app. File tải bằng `curl` không bị macOS gắn cờ nên **không có hộp thoại Gatekeeper**. Các bản sau cài được ngay trong Cài đặt › Cập nhật (hoặc chạy lại đúng lệnh này). Sau đó cấp quyền Trợ năng khi được hỏi (để dán bằng ⌘V).
+Lệnh này tải bản mới nhất, kiểm tra đúng là app thật, cài vào Applications rồi mở app.
 
-### Cài thủ công
+<details>
+<summary>Muốn tự tải về?</summary>
 
-1. Tải `9clipboard-<phiên bản>.zip` ở trang [Releases](https://github.com/lamht09/9clipboard/releases), giải nén và chuyển `9clipboard.app` vào `/Applications`.
-2. Mở app. App ký bằng chứng chỉ tự ký, không được Apple công chứng (notarize), nên macOS chặn lần mở đầu của **mỗi bản mới**: vào System Settings › Quyền riêng tư & Bảo mật › **Vẫn mở** (Open Anyway). Hoặc bỏ qua bước này bằng cách xoá cờ tải về trước khi mở:
-   ```sh
-   xattr -dr com.apple.quarantine /Applications/9clipboard.app
-   ```
-3. Cấp quyền Trợ năng khi được hỏi (để dán bằng ⌘V). Mọi bản phát hành ký cùng một chứng chỉ nên cập nhật bằng cách thay app vẫn giữ quyền này.
+1. Tải `9clipboard-<phiên bản>.zip` ở trang [Releases](https://github.com/lamht09/9clipboard/releases), giải nén và kéo `9clipboard.app` vào Applications.
+2. Mở app. macOS sẽ báo không kiểm tra được app, vì 9clipboard không đăng ký với Apple. Vào **System Settings › Quyền riêng tư & Bảo mật** và bấm **Vẫn mở** (Open Anyway). Mỗi bản mới tải theo cách này sẽ hỏi lại một lần.
 
-## Build và cài
+</details>
 
-```sh
-make cert      # chỉ chạy một lần: tạo chứng chỉ tự ký "9clipboard Dev" trong Keychain
-make install   # build release, ký, copy vào /Applications/9clipboard-dev.app và mở app
-```
+## Bắt đầu
 
-Các lệnh khác:
+1. Copy vài thứ như bình thường.
+2. Bấm **⌥V**. Lịch sử hiện thành một dải thẻ ở đáy màn hình.
+3. Click một thẻ (hoặc bấm Enter) là nội dung được dán vào app bạn đang dùng.
 
-| Lệnh | Việc |
-|---|---|
-| `make run` | Build, ký và chạy từ `build/9clipboard-dev.app` |
-| `make test` | Chạy unit test của `ClipCore` (đừng dùng `swift test` trần: chỉ có Command Line Tools thì thỉnh thoảng không nạp được plugin `TestingMacros`) |
-| `make bench` | Đo tìm kiếm 2000 mục ở bản release (mục tiêu < 10ms) |
-| `scripts/make-icon.sh` | Vẽ lại `Resources/AppIcon.icns` |
+Lần đầu, macOS sẽ hỏi cho phép **Trợ năng** (Accessibility) cho 9clipboard. Quyền này để app bấm ⌘V giúp bạn. Bật trong **System Settings › Quyền riêng tư & Bảo mật › Trợ năng**. Không muốn cấp cũng không sao: click thẻ thì nội dung được copy và bạn tự bấm ⌘V, hoặc kéo thẻ thả vào app kia.
 
-**Vì sao cần chứng chỉ tự ký:** macOS nhớ quyền Trợ năng theo chữ ký của app. Ký ad-hoc thì mỗi lần build là một chữ ký mới và quyền bị mất; ký bằng cùng một chứng chỉ thì quyền được giữ.
+## Làm được gì
 
-**Bản build trên máy là một app riêng:** `make run` / `make install` tạo **9clipboard Dev** (bundle ID `io.github.lamht09.9clipboard.dev`, dữ liệu ở `~/Library/Application Support/9clipboard-dev/`), nên không tranh quyền Trợ năng hay lịch sử với bản release đã cài.
+- **Tìm nhanh.** Cứ gõ là tìm. Không cần dấu, không cần gõ đủ chữ: `da nang` ra “Đà Nẵng”.
+- **Dán không định dạng** khi bấm ⇧Enter.
+- **Kéo thả.** Kéo thẻ vào tài liệu, ô chat, Notes hay Finder.
+- **Giữ thứ hay dùng.** Ghim thẻ vào Pinboard; thẻ đã ghim không bao giờ bị xoá.
+- **Tự dọn mật khẩu.** Mật khẩu copy từ 1Password, Passwords… tự xoá sau 15 phút nếu bạn không giữ lại.
+- **Không làm phiền.** Loại trừ những app không muốn ghi lại, hoặc tạm dừng ghi từ menu bar.
+- **Nói ngôn ngữ của bạn.** English, Tiếng Việt, 简体中文, 繁體中文, 日本語, 한국어, Español, Français, Deutsch, Português, Русский, Italiano.
+- **Tự cập nhật** trong Cài đặt › Cập nhật.
 
-**Bản phát hành** do GitHub Actions build và ký khi push tag `v*`, job ký chờ duyệt tay trong environment `release`. Thiết lập một lần: `make release-cert` tạo chứng chỉ và lưu thành secret của environment (xem `.github/workflows/release.yml`).
+## Phím tắt
 
-## Cấp quyền
-
-Lần đầu chạy, app xin quyền **Trợ năng (Accessibility)** để gửi phím ⌘V vào app đang dùng:
-
-System Settings › Quyền riêng tư & Bảo mật › Trợ năng › bật **9clipboard** (hoặc **9clipboard Dev** với bản build trên máy).
-
-Không cấp cũng dùng được: chọn thẻ thì nội dung được copy, bạn tự bấm ⌘V, hoặc kéo thẻ thả thẳng vào app kia. Trạng thái quyền xem ở Cài đặt › Quyền.
-
-## Phím tắt trong panel
+Trong panel:
 
 | Phím | Việc |
 |---|---|
-| gõ chữ | Tìm kiếm |
-| `←` `→` | Chọn thẻ |
-| `Enter` / click | Dán |
+| Gõ chữ | Tìm kiếm |
+| `←` `→` | Chuyển thẻ |
+| `Enter` hoặc click | Dán |
 | `⇧Enter` | Dán dạng text thuần |
-| `⌘1`…`⌘9` | Dán nhanh thẻ thứ 1–9 |
-| kéo thẻ ra khỏi panel | Thả nội dung đúng chỗ nhả chuột (ô nhập, Notes, Finder…); không cần quyền Trợ năng |
-| `Space` | Xem trước cỡ lớn (khi ô tìm trống) |
-| `Tab` / `⇧Tab` | Đổi tab lọc |
-| `⌘P` | Ghim vào Pinboard |
-| `⌘⌫` | Xoá thẻ |
-| `Esc` | Đóng xem trước → xoá ô tìm → đóng panel |
+| `⌘1` … `⌘9` | Dán thẻ thứ 1–9 |
+| `Space` | Xem trước cỡ lớn |
+| `Tab` | Tab lọc tiếp theo (Tất cả, Text, Ảnh…) |
+| `⌘P` | Ghim |
+| `⌘⌫` | Xoá |
+| `Esc` | Đóng |
 
-Đổi phím tắt mở panel, giới hạn lịch sử, chạy khi đăng nhập… ở menu bar › **Cài đặt…** (⌘,).
+Muốn đổi ⌥V hay các tuỳ chọn khác, click biểu tượng 9clipboard trên menu bar và chọn **Cài đặt…**.
 
-## Dữ liệu
+## Quyền riêng tư
 
-`~/Library/Application Support/9clipboard/` (quyền 0700): `clips.sqlite`, ảnh gốc trong `blobs/`, thumbnail trong `thumbs/`. Xoá thư mục này là xoá sạch lịch sử.
+- Lịch sử chỉ lưu trên máy bạn.
+- Lần duy nhất 9clipboard lên mạng là hỏi GitHub số phiên bản mới nhất. Không gửi gì về bạn hay clipboard, và tắt được trong Cài đặt › Cập nhật.
+- Quyền Trợ năng chỉ dùng để bấm ⌘V giúp bạn.
 
-Nếu sửa DB bằng `sqlite3`, luôn chạy `pragma foreign_keys=on;` trước, nếu không sẽ sót dòng mồ côi và app không khởi động được.
+## Câu hỏi thường gặp
+
+**Click thẻ mà không dán.**
+Xem Cài đặt › Quyền. Nếu chưa có quyền Trợ năng, bật 9clipboard trong System Settings › Quyền riêng tư & Bảo mật › Trợ năng.
+
+**Cập nhật thế nào?**
+Cài đặt › Cập nhật, hoặc chạy lại lệnh cài. Lịch sử và cài đặt vẫn được giữ nguyên.
+
+**Gỡ cài đặt thế nào?**
+Thoát 9clipboard từ biểu tượng trên menu bar rồi kéo app từ Applications vào Thùng rác. Muốn xoá luôn lịch sử thì xoá thư mục `~/Library/Application Support/9clipboard`.
+
+## Dành cho lập trình viên
+
+Build từ mã nguồn, chạy test và phát hành: xem [CONTRIBUTING.md](../CONTRIBUTING.md) (tiếng Anh).
 
 ## Giấy phép
 
-[MIT](LICENSE)
+[MIT](../LICENSE)

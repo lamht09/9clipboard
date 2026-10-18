@@ -1,103 +1,95 @@
 # 9clipboard
 
-**English** · [Tiếng Việt](README.vi.md)
+**English** · [Tiếng Việt](readme/README.vi.md) · [简体中文](readme/README.zh-Hans.md) · [繁體中文](readme/README.zh-Hant.md) · [日本語](readme/README.ja.md) · [한국어](readme/README.ko.md) · [Español](readme/README.es.md) · [Français](readme/README.fr.md) · [Deutsch](readme/README.de.md) · [Português](readme/README.pt-BR.md) · [Русский](readme/README.ru.md) · [Italiano](readme/README.it.md)
 
-[![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) ![Apple Silicon](https://img.shields.io/badge/Apple%20Silicon-arm64-black) ![Swift 6](https://img.shields.io/badge/Swift-6-orange?logo=swift) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![Release](https://img.shields.io/github/v/release/lamht09/9clipboard?include_prereleases&sort=semver)](https://github.com/lamht09/9clipboard/releases) [![Downloads](https://img.shields.io/github/downloads/lamht09/9clipboard/total)](https://github.com/lamht09/9clipboard/releases) ![macOS 14+](https://img.shields.io/badge/macOS-14%2B-blue?logo=apple) [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
 
-A free, open-source **clipboard manager for Mac** that keeps your **clipboard history** (text, rich text and images) private and offline — a lightweight alternative to Paste and Maccy, built natively in Swift/SwiftUI for macOS (Apple Silicon). Press **⌥V** to open a strip of cards at the bottom of the screen; pick a card and it is pasted straight into the app you are using.
+**A clipboard history for your Mac.** Copy as usual, then press **⌥V** (Option‑V) to get back anything you copied earlier — text, formatted text or images — and paste it into the app you are using.
 
-![9clipboard demo: open with ⌥V, search without accents, filter, preview, click to paste, drag a card into another app, pin](assets/demo.gif)
+Free, open source and private: your history never leaves your Mac. A lightweight alternative to Paste and Maccy.
 
-▶ [Full demo video (49s)](assets/demo.mp4)
+![9clipboard demo: open with ⌥V, search, filter, preview, click to paste, drag a card into another app, pin](assets/demo.gif)
 
-- Keeps text, rich text and images; fuzzy, accent-insensitive search (typing `da nang` finds “Đà Nẵng”)
-- Pin items to Pinboards; pinned items are never deleted
-- Passwords (from 1Password, Passwords…) are removed after 15 minutes; exclude apps, pause recording
-- English and Vietnamese interface (follows your Mac’s language; change it in Settings › General)
-- Updates itself from Settings › Updates (check automatically or by hand, install with one click or automatically)
-- All data stays on your Mac — the only network request is the update check, which asks GitHub for the latest version number and can be turned off
+▶ [Watch the full demo (49 seconds)](assets/demo.mp4)
 
-## Requirements
+## Install
 
-- macOS 14 or later on Apple Silicon (every Apple Silicon Mac, including M1, can update to macOS 14)
-- To build from source: Swift 6 — the Command Line Tools are enough, no Xcode needed: `xcode-select --install`
+You need a Mac with Apple Silicon (M1 or newer) running macOS 14 Sonoma or later.
 
-## Install a release
-
-### Quick install (recommended)
-
-Paste this into Terminal:
+Open **Terminal** (press ⌘Space, type “Terminal”, press Enter), paste this line and press Enter:
 
 ```sh
 curl -fsSL https://raw.githubusercontent.com/lamht09/9clipboard/main/install.sh | bash
 ```
 
-It downloads the latest release, checks that it is signed with the 9clipboard release certificate, installs it to `/Applications` and opens it. Files downloaded by `curl` are not flagged by macOS, so there is **no Gatekeeper prompt**. Later versions can be installed from Settings › Updates (or by running the same command again). Then grant Accessibility access when asked (needed to paste with ⌘V).
+It downloads the latest version, checks that it is the genuine app, puts it in Applications and opens it.
 
-### Manual install
+<details>
+<summary>Prefer to download it yourself?</summary>
 
-1. Download `9clipboard-<version>.zip` from [Releases](https://github.com/lamht09/9clipboard/releases), unzip it and move `9clipboard.app` to `/Applications`.
-2. Open it. The app is signed with a self-signed certificate, not notarized by Apple, so macOS blocks it the first time **every new version** is opened: go to System Settings › Privacy & Security › **Open Anyway**. Or skip that prompt by clearing the download flag before opening:
-   ```sh
-   xattr -dr com.apple.quarantine /Applications/9clipboard.app
-   ```
-3. Grant Accessibility access when asked (needed to paste with ⌘V). Every release is signed with the same certificate, so updating by replacing the app keeps this permission.
+1. Download `9clipboard-<version>.zip` from [Releases](https://github.com/lamht09/9clipboard/releases), unzip it and drag `9clipboard.app` into Applications.
+2. Open it. macOS will say it can’t check the app, because 9clipboard isn’t registered with Apple. Go to **System Settings › Privacy & Security** and click **Open Anyway**. This happens once for each new version you download this way.
 
-## Build and install
+</details>
 
-Clone the repo, then:
+## Getting started
 
-```sh
-make cert      # once: creates a self-signed "9clipboard Dev" certificate in your Keychain
-make install   # builds release, signs, copies to /Applications/9clipboard-dev.app and launches it
-```
+1. Copy a few things as you normally would.
+2. Press **⌥V**. Your history appears as a row of cards at the bottom of the screen.
+3. Click a card (or press Enter) and it is pasted into the app you were using.
 
-Other commands:
+The first time, macOS asks you to allow **Accessibility** for 9clipboard. This lets it press ⌘V for you. Turn it on in **System Settings › Privacy & Security › Accessibility**. If you’d rather not, 9clipboard still works: clicking a card copies it and you press ⌘V yourself, or you drag the card into the other app.
 
-| Command | What it does |
-|---|---|
-| `make run` | Build, sign and run from `build/9clipboard-dev.app` |
-| `make test` | Run the `ClipCore` unit tests (don't use plain `swift test`: with only the Command Line Tools it sometimes fails to load the `TestingMacros` plugin) |
-| `make bench` | Benchmark search over 2,000 items in a release build (target < 10 ms) |
-| `scripts/make-icon.sh` | Redraw `Resources/AppIcon.icns` |
+## What it does
 
-**Why a self-signed certificate:** macOS remembers the Accessibility permission by the app's signature. With ad-hoc signing every build gets a new signature and the permission is lost; signing with the same certificate keeps it.
+- **Finds things fast.** Just start typing. You don’t need accents or whole words: `cafe` finds “Café”.
+- **Pastes without formatting** when you press ⇧Enter.
+- **Drag and drop.** Drag a card into a document, a chat, Notes or Finder.
+- **Keeps what you reuse.** Pin cards to Pinboards; pinned cards are never deleted.
+- **Cleans up passwords.** Passwords copied from 1Password, Passwords and similar apps are deleted after 15 minutes unless you keep them.
+- **Stays out of the way.** Exclude apps you don’t want recorded, or pause recording from the menu bar.
+- **Speaks your language.** English, Tiếng Việt, 简体中文, 繁體中文, 日本語, 한국어, Español, Français, Deutsch, Português, Русский, Italiano.
+- **Updates itself** from Settings › Updates.
 
-**Local builds are a separate app:** `make run` / `make install` produce **9clipboard Dev** (bundle ID `io.github.lamht09.9clipboard.dev`, data in `~/Library/Application Support/9clipboard-dev/`), so they never fight with an installed release over the Accessibility permission or the history.
+## Keyboard shortcuts
 
-**Releases** are built and signed by GitHub Actions when a `v*` tag is pushed; the signing job waits for manual approval in the `release` environment. One-time setup: `make release-cert` creates the certificate and stores it as environment secrets (see `.github/workflows/release.yml`).
-
-## Permissions
-
-On first launch the app asks for **Accessibility** permission so it can send ⌘V to the active app:
-
-System Settings › Privacy & Security › Accessibility › enable **9clipboard** (or **9clipboard Dev** for a local build).
-
-It still works without it: choosing a card copies its content and you press ⌘V yourself, or drag the card straight into the other app. Check the permission status under Settings › Permissions.
-
-## Panel shortcuts
+In the panel:
 
 | Key | Action |
 |---|---|
-| type | Search |
-| `←` `→` | Select a card |
-| `Enter` / click | Paste |
+| Type | Search |
+| `←` `→` | Move between cards |
+| `Enter` or click | Paste |
 | `⇧Enter` | Paste as plain text |
-| `⌘1`…`⌘9` | Quick-paste card 1–9 |
-| drag a card out of the panel | Drop its content where you release it (text field, Notes, Finder…); no Accessibility needed |
-| `Space` | Large preview (when the search field is empty) |
-| `Tab` / `⇧Tab` | Switch filter tab |
-| `⌘P` | Pin to a Pinboard |
-| `⌘⌫` | Delete card |
-| `Esc` | Close preview → clear search → close panel |
+| `⌘1` … `⌘9` | Paste card 1–9 |
+| `Space` | Large preview |
+| `Tab` | Next filter (All, Text, Image…) |
+| `⌘P` | Pin |
+| `⌘⌫` | Delete |
+| `Esc` | Close |
 
-Change the panel hotkey, history limit, launch at login and more from the menu bar › **Settings…** (⌘,).
+To change ⌥V and other options, click the 9clipboard icon in the menu bar and choose **Settings…**.
 
-## Data
+## Privacy
 
-`~/Library/Application Support/9clipboard/` (mode 0700): `clips.sqlite`, original images in `blobs/`, thumbnails in `thumbs/`. Deleting this folder wipes all history.
+- Your history is stored only on your Mac.
+- The only time 9clipboard goes online is to ask GitHub for the latest version number. Nothing about you or your clipboard is sent, and you can turn it off in Settings › Updates.
+- Accessibility access is used only to press ⌘V for you.
 
-If you edit the database with `sqlite3`, always run `pragma foreign_keys=on;` first; otherwise orphaned rows are left behind and the app will fail to start.
+## Questions
+
+**Clicking a card doesn’t paste.**
+Check Settings › Permissions. If Accessibility isn’t allowed, turn on 9clipboard in System Settings › Privacy & Security › Accessibility.
+
+**How do I update?**
+Settings › Updates, or run the install command again. Your history and settings are kept.
+
+**How do I uninstall?**
+Quit 9clipboard from its menu bar icon and move it from Applications to the Trash. To also delete your history, delete the folder `~/Library/Application Support/9clipboard`.
+
+## For developers
+
+Building from source, running tests and making releases: see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
